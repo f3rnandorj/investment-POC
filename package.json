@@ -1,0 +1,28 @@
+{
+  "name": "investo-challenge",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/f3rnandorj/investo-challenge",
+  "author": "FERNANDO HENRIQUE FERNANDES DA SILVA <f3rnandorj10@gmail.com>",
+  "scripts": {
+    "start:dev": "tsx watch src/server.ts",
+    "start:prod": "node build/server.js",
+    "build": "tsup src --out-dir build"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@eslint/js": "9.21.0",
+    "@types/node": "22.13.5",
+    "eslint": "9.21.0",
+    "globals": "16.0.0",
+    "tsup": "8.3.6",
+    "tsx": "4.19.3",
+    "typescript": "5.7.3",
+    "typescript-eslint": "8.25.0"
+  },
+  "dependencies": {
+    "dotenv": "16.4.7",
+    "fastify": "5.2.1",
+    "zod": "3.24.2"
+  }
+}
