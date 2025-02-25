@@ -101,8 +101,6 @@ async function parseXLSX(filePath: string): Promise<Record<string, unknown>[]> {
 }
 
 async function insertData( modelName: ModelNames, data: any) {
-  console.log({ modelName, data });
-
   switch (modelName) {
   case ModelNames.ASSET_INFO:
     await prisma.assetInfo.create({ data });
@@ -151,6 +149,7 @@ async function insertData( modelName: ModelNames, data: any) {
       });
     }
     }
+
     break;
   default:
     throw new Error(`Model "${modelName}" not recognized.`);
@@ -164,17 +163,17 @@ async function importData() {
     const filePath = path.join(DATA_FOLDER, file);
     let jsonData: any[] = [];
     
-    if (file.endsWith(".json")) {
-      jsonData = [JSON.parse(fs.readFileSync(filePath, "utf-8"))];
+    // if (file.endsWith(".json")) {
+    //   jsonData = [JSON.parse(fs.readFileSync(filePath, "utf-8"))];
+    // } else 
+    if (file.endsWith(".csv")) {
+      jsonData = await parseCSV(filePath);
     } 
-    // else if (file.endsWith(".csv")) {
-    //   jsonData = await parseCSV(filePath);
-    // } else if (file.endsWith(".xlsx")) {
+    // else if (file.endsWith(".xlsx")) {
     //   jsonData = await parseXLSX(filePath);
     // }
 
     if (jsonData.length > 0 ) {
-      console.log("aqui");
       let modelName: ModelNames;
 
       if (file.startsWith("ativos")) {
@@ -232,7 +231,9 @@ async function importData() {
         try {
           await insertData(modelName, data);
           
-          console.log(`Inserted ${jsonData.length} records into ${modelName}`);
+          if(jsonData.length === jsonData.length) {
+            console.log(`Inserted ${jsonData.length} records into ${modelName}`);
+          }
         } catch (error) {
           console.log(error);
         }
