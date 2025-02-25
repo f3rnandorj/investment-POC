@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Asset {
+  id                      String         @id @default(auto()) @map("_id") @db.ObjectId
+  symbol                  String         @unique
+  long_name               String
+  short_name              String
+  exchange_name           String
+  full_exchange_name      String
+  instrument_type         String
+  currency                String
+  first_trade_date        Int
+  regular_market_time     Int
+  regular_market_price    Float
+  fifty_two_week_high     Float
+  fifty_two_week_low      Float
+  regular_market_day_high Float
+  regular_market_day_low  Float
+  regular_market_volume   Int
+  previous_close          Float?
+  price_history           PriceHistory[]
+}
+
+model PriceHistory {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  asset_id    String
+  timestamp   Int
+  open_price  Float
+  high_price  Float
+  low_price   Float
+  close_price Float
+  volume      Int
+  Asset       Asset?  @relation(fields: [assetId], references: [id])
+  assetId     String? @db.ObjectId
+}
+
+model AssetInfo {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  asset_code   String @unique
+  name         String
+  description  String
+  category     String
+  tag          String
+  type         String
+  subtype      String
+  bovespa_name String
+}
+
+model Cdi {
+  id   String   @id @default(auto()) @map("_id") @db.ObjectId
+  date DateTime @unique
+  rate String
+}
