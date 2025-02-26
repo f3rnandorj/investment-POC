@@ -3,9 +3,9 @@ import fs from "fs";
 import path from "path";
 import csv from "csv-parser";
 import xlsx from "xlsx";
-import { Asset, Prisma, PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { dateUtils } from "../utils/dateUtils";
-// import { env } from "../env";
+import { stringUtils } from "../utils/stringUtils";
 
 interface NativeAssetItem {
   codigoAtivo: string;
@@ -24,53 +24,44 @@ interface NativeCDI {
 }
 
 interface ChartMeta {
-  symbol?: string;
-  longName?: string;
-  shortName?: string;
-  exchangeName?: string;
-  fullExchangeName?: string;
-  instrumentType?: string;
-  currency?: string;
-  firstTradeDate?: number;
-  regularMarketTime?: number;
-  regularMarketPrice?: number;
-  fiftyTwoWeekHigh?: number;
-  fiftyTwoWeekLow?: number;
-  regularMarketDayHigh?: number;
-  regularMarketDayLow?: number;
-  regularMarketVolume?: number;
-  previousClose?: number;
+  symbol: string;
+  longName: string;
+  shortName: string;
+  exchangeName: string;
+  fullExchangeName: string;
+  instrumentType: string;
+  currency: string;
+  firstTradeDate: number;
+  regularMarketTime: number;
+  regularMarketPrice: number;
+  fiftyTwoWeekHigh: number;
+  fiftyTwoWeekLow: number;
+  regularMarketDayHigh: number;
+  regularMarketDayLow: number;
+  regularMarketVolume: number;
+  previousClose: number;
 }
 
 interface QuoteIndicators {
-  open?: number[];
-  high?: number[];
-  low?: number[];
-  close?: number[];
-  volume?: number[];
+  open: number[];
+  high: number[];
+  low: number[];
+  close: number[];
+  volume: number[];
 }
 
 interface ChartResult {
-  meta?: ChartMeta;
-  timestamp?: number[];
-  indicators?: {
-    quote?: QuoteIndicators[];
+  meta: ChartMeta;
+  timestamp: number[];
+  indicators: {
+    quote: QuoteIndicators[];
   };
 }
 
 interface ChartData {
-  chart?: {
-    result?: ChartResult[];
+  chart: {
+    result: ChartResult[];
   };
-}
-
-interface PriceHistory {
-  timestamp: number;
-  open_price?: number;
-  high_price?: number;
-  low_price?: number;
-  close_price?: number;
-  volume?: number;
 }
 
 enum ModelNames {
@@ -122,49 +113,34 @@ async function insertData(modelName: ModelNames, dataArray: any[]) {
     break;
 
   case ModelNames.ASSET:{
-    const createdAssets: any[] = [];
-    
     for (const data of dataArray) {
-      const asset = await prisma.asset.create({
+      const assetItem = data as Prisma.AssetCreateInput;
+  
+      await prisma.asset.create({
         data: {
-          symbol: data.symbol,
-          long_name: data.long_name,
-          short_name: data.short_name,
-          exchange_name: data.exchange_name,
-          full_exchange_name: data.full_exchange_name,
-          instrument_type: data.instrument_type,
-          currency: data.currency,
-          first_trade_date: data.first_trade_date,
-          regular_market_time: data.regular_market_time,
-          regular_market_price: data.regular_market_price,
-          fifty_two_week_high: data.fifty_two_week_high,
-          fifty_two_week_low: data.fifty_two_week_low,
-          regular_market_day_high: data.regular_market_day_high,
-          regular_market_day_low: data.regular_market_day_low,
-          regular_market_volume: data.regular_market_volume,
-          previous_close: data.previous_close,
+          symbol: stringUtils.getStringBeforeDot(assetItem.symbol),
+          long_name: assetItem.long_name,
+          short_name: assetItem.short_name,
+          exchange_name: assetItem.exchange_name,
+          full_exchange_name: assetItem.full_exchange_name,
+          instrument_type: assetItem.instrument_type,
+          currency: assetItem.currency,
+          first_trade_date: assetItem.first_trade_date,
+          regular_market_time: assetItem.regular_market_time,
+          regular_market_price: assetItem.regular_market_price,
+          fifty_two_week_high: assetItem.fifty_two_week_high,
+          fifty_two_week_low: assetItem.fifty_two_week_low,
+          regular_market_day_high: assetItem.regular_market_day_high,
+          regular_market_day_low: assetItem.regular_market_day_low,
+          regular_market_volume: assetItem.regular_market_volume,
+          previous_close: assetItem.previous_close,
+
+          priceHistory: assetItem.priceHistory
         },
-      });
-    
-      createdAssets.push({ id: asset.id, priceHistory: data.price_history?.create || [] });
-    }
-    
-    const priceHistoryData = createdAssets.flatMap(({ id, priceHistory }) => priceHistory.map((history: any) => ({
-      asset_id: id, 
-      timestamp: history.timestamp,
-      open_price: history.open_price ?? 0,
-      high_price: history.high_price ?? 0,
-      low_price: history.low_price ?? 0,
-      close_price: history.close_price ?? 0,
-      volume: history.volume ?? 0,
-    })));
-    
-    for (let i = 0; i < priceHistoryData.length; i += batchSize) {
-      await prisma.priceHistory.createMany({
-        data: priceHistoryData.slice(i, i + batchSize),
       });
     }
   }
+  
     break;
 
   default:
@@ -209,35 +185,39 @@ async function importData() {
         }));
       } else {
         modelName = ModelNames.ASSET;
-        jsonData = jsonData.map((item: ChartData) => ({
-          symbol: item.chart?.result?.[0]?.meta?.symbol,
-          long_name: item.chart?.result?.[0]?.meta?.longName,
-          short_name: item.chart?.result?.[0]?.meta?.shortName,
-          exchange_name: item.chart?.result?.[0]?.meta?.exchangeName,
-          full_exchange_name: item.chart?.result?.[0]?.meta?.fullExchangeName,
-          instrument_type: item.chart?.result?.[0]?.meta?.instrumentType,
-          currency: item.chart?.result?.[0]?.meta?.currency,
-          first_trade_date: item.chart?.result?.[0]?.meta?.firstTradeDate,
-          regular_market_time: item.chart?.result?.[0]?.meta?.regularMarketTime,
-          regular_market_price: item.chart?.result?.[0]?.meta?.regularMarketPrice,
-          fifty_two_week_high: item.chart?.result?.[0]?.meta?.fiftyTwoWeekHigh,
-          fifty_two_week_low: item.chart?.result?.[0]?.meta?.fiftyTwoWeekLow,
-          regular_market_day_high: item.chart?.result?.[0]?.meta?.regularMarketDayHigh,
-          regular_market_day_low: item.chart?.result?.[0]?.meta?.regularMarketDayLow,
-          regular_market_volume: item.chart?.result?.[0]?.meta?.regularMarketVolume,
-          previous_close: item.chart?.result?.[0]?.meta?.previousClose,
+        jsonData = jsonData.map((item: ChartData): Prisma.AssetCreateInput => ({
+          symbol: item.chart.result[0].meta.symbol,
+          long_name: item.chart.result[0].meta.longName,
+          short_name: item.chart.result[0].meta.shortName,
+          exchange_name: item.chart.result[0].meta.exchangeName,
+          full_exchange_name: item.chart.result[0].meta.fullExchangeName,
+          instrument_type: item.chart.result[0].meta.instrumentType,
+          currency: item.chart.result[0].meta.currency,
+          first_trade_date: item.chart.result[0].meta.firstTradeDate,
+          regular_market_time: item.chart.result[0].meta.regularMarketTime,
+          regular_market_price: item.chart.result[0].meta.regularMarketPrice,
+          fifty_two_week_high: item.chart.result[0].meta.fiftyTwoWeekHigh,
+          fifty_two_week_low: item.chart.result[0].meta.fiftyTwoWeekLow,
+          regular_market_day_high: item.chart.result[0].meta.regularMarketDayHigh,
+          regular_market_day_low: item.chart.result[0].meta.regularMarketDayLow,
+          regular_market_volume: item.chart.result[0].meta.regularMarketVolume,
+          previous_close: item.chart.result[0].meta.previousClose,
 
-          price_history: {
-            create: item.chart?.result?.[0]?.timestamp?.map((ts: number, index: number) => ({
-              timestamp: ts,
-              open_price: item.chart?.result?.[0]?.indicators?.quote?.[0]?.open?.[index] ?? 0,
-              high_price: item.chart?.result?.[0]?.indicators?.quote?.[0]?.high?.[index] ?? 0,
-              low_price: item.chart?.result?.[0]?.indicators?.quote?.[0]?.low?.[index] ?? 0,
-              close_price: item.chart?.result?.[0]?.indicators?.quote?.[0]?.close?.[index] ?? 0,
-              volume: item.chart?.result?.[0]?.indicators?.quote?.[0]?.volume?.[index] ?? 0,
-            })) || [],
-          },
+          priceHistory: JSON.stringify(
+            item.chart.result[0].timestamp?.map((ts: number, index: number) => {
+              console.log(ts);
+              return({
+                timestamp: ts,
+                open_price: item.chart.result[0].indicators.quote[0].open?.[index] ?? null,
+                high_price: item.chart.result[0].indicators.quote[0].high?.[index] ?? null,
+                low_price: item.chart.result[0].indicators.quote[0].low?.[index] ?? null,
+                close_price: item.chart.result[0].indicators.quote[0].close?.[index] ?? null,
+                volume: item.chart.result[0].indicators.quote[0].volume?.[index] ?? null
+              });
+            }) ?? []
+          )
         }));
+
       }
     }
 

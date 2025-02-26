@@ -1,1 +1,3 @@
-export * from "./PrismaAssetInfosRepository";
+export * from "./PrismaAssetInfoRepository";
+export * from "./PrismaAssetRepository";
+export * from "./PrismaCDIRepository";

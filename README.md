@@ -2,8 +2,8 @@
 
 Requisitos Funcionais (RFs)
 Consulta de Ativos Disponíveis para Simulação
-[] -  O sistema deve disponibilizar um endpoint para consulta de ativos disponíveis.
-[] -  A resposta deve conter, no mínimo, os campos: codigoAtivo, classe e etiqueta.
+[X] -  O sistema deve disponibilizar um endpoint para consulta de ativos disponíveis.
+[X] -  A resposta deve conter, no mínimo, os campos: codigoAtivo, classe e etiqueta.
 
 Consulta de Rentabilidade de Índice Dia a Dia
 [] -  O sistema deve fornecer um endpoint que receba o ticker de um ativo e retorne a rentabilidade diária.

@@ -8,8 +8,8 @@ datasource db {
 }
 
 model Asset {
-  id                      String         @id @default(auto()) @map("_id") @db.ObjectId
-  symbol                  String         @unique
+  id                      String @id @default(auto()) @map("_id") @db.ObjectId
+  symbol                  String @unique
   long_name               String
   short_name              String
   exchange_name           String
@@ -25,24 +25,9 @@ model Asset {
   regular_market_day_low  Float
   regular_market_volume   Int
   previous_close          Float?
-  price_history           PriceHistory[]
+  priceHistory            Json
 
   @@map("assets")
-}
-
-model PriceHistory {
-  id          String  @id @default(auto()) @map("_id") @db.ObjectId
-  asset_id    String
-  timestamp   Int
-  open_price  Float
-  high_price  Float
-  low_price   Float
-  close_price Float
-  volume      Int
-  Asset       Asset?  @relation(fields: [assetId], references: [id])
-  assetId     String? @db.ObjectId
-
-  @@map("price_histories")
 }
 
 model AssetInfo {
