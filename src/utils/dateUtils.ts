@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import { get as isBusinessDay } from "is-business-day";
 
 function convertToISODate(dateStr: string | Date): Date | string {
   if (dateStr instanceof Date) {
@@ -12,12 +13,21 @@ function convertToISODate(dateStr: string | Date): Date | string {
 }
 
 function formatTimestamp(timestamp: number): string {
-  // Se o timestamp estiver em segundos, converte para milissegundos
   const date = new Date(timestamp * (timestamp < 1e12 ? 1000 : 1));
   return format(date, "dd/MM/yyyy");
 }
 
+function removeNotBusinessDays<T>(dataArray: T[], dateKey: keyof T): T[] {
+  return dataArray.filter((item) => {
+    const dateStr = item[dateKey] as unknown as string;
+    const date = new Date(dateStr);
+
+    return isBusinessDay(date, "America/Sao_Paulo");
+  });
+}
+
 export const dateUtils = {
   convertToISODate,
-  formatTimestamp
+  formatTimestamp,
+  removeNotBusinessDays
 };

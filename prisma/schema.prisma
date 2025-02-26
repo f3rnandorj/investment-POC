@@ -25,7 +25,7 @@ model Asset {
   regular_market_day_low  Float
   regular_market_volume   Int
   previous_close          Float?
-  priceHistory            Json
+  price_history           Json
 
   @@map("assets")
 }

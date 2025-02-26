@@ -1420,6 +1420,14 @@ ipaddr.js@^2.1.0:
   resolved "https://registry.yarnpkg.com/ipaddr.js/-/ipaddr.js-2.2.0.tgz#d33fa7bac284f4de7af949638c9d68157c6b92e8"
   integrity sha512-Ag3wB2o37wslZS19hZqorUnrnzSkpOVy+IiiDEiTqNubEYpYuHWIf6K4psgN2ZWKExS4xhVCrRVfb/wfW8fWJA==
 
+is-business-day@1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/is-business-day/-/is-business-day-1.0.1.tgz#81b415ff5fb50a6213514e662c05f26d7f42b001"
+  integrity sha512-pMoUL2+DlsLH2NgUneKXeOH7a6VXuSWzBBsdofU1Puh7ZU5usDpd67ZVZDCoBXGRKqUxlgxyzWsn++NfpgxNRw==
+  dependencies:
+    lodash.isdate "^2.4.1"
+    moment-timezone "^0.3.0"
+
 is-extglob@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/is-extglob/-/is-extglob-2.1.1.tgz#a88c02535791f02ed37c76a1b9ea9773c833f8c2"
@@ -1541,6 +1549,11 @@ locate-path@^6.0.0:
   dependencies:
     p-locate "^5.0.0"
 
+lodash.isdate@^2.4.1:
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/lodash.isdate/-/lodash.isdate-2.4.1.tgz#e89535279ac771e52bd73ce9507389dbca0422fa"
+  integrity sha512-p4r1bPMbTG51XZA7uvY95jjLA5av1gHpiI90GeFaDd9eZpGAwxf8gdqPNa+ryXl0U/NrFG0CP7ZABkKY23i2wg==
+
 lodash.merge@^4.6.2:
   version "4.6.2"
   resolved "https://registry.yarnpkg.com/lodash.merge/-/lodash.merge-4.6.2.tgz#558aa53b43b661e1925a0afdfa36a9a1085fe57a"
@@ -1597,6 +1610,18 @@ minimatch@^9.0.4:
   version "7.1.2"
   resolved "https://registry.yarnpkg.com/minipass/-/minipass-7.1.2.tgz#93a9626ce5e5e66bd4db86849e7515e92340a707"
   integrity sha512-qOOzS1cBTWYF4BH8fVePDBOO9iptMnGUEZwNc/cMWnTV2nVLZ7VoNWEPHkYczZA0pdoA7dl6e7FL659nX9S2aw==
+
+moment-timezone@^0.3.0:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.3.1.tgz#3ef47856b02d53b718a10a5ec2023aa299e07bf5"
+  integrity sha512-glTWIu3fKgZIMS9KwaPYvyf7M6jazusAGvWEOqfL09nXDtYTO75BEXqseQhwNAcQvifQlQ9Q7tWpMnDu+TxT+w==
+  dependencies:
+    moment ">= 2.6.0"
+
+"moment@>= 2.6.0":
+  version "2.30.1"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.30.1.tgz#f8c91c07b7a786e30c59926df530b4eac96974ae"
+  integrity sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how==
 
 mongodb-connection-string-url@^3.0.0:
   version "3.0.2"

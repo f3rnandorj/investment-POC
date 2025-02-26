@@ -8,6 +8,8 @@ Consulta de Ativos Disponíveis para Simulação
 Consulta de Rentabilidade de Índice Dia a Dia
 [] -  O sistema deve fornecer um endpoint que receba o ticker de um ativo e retorne a rentabilidade diária.
 [] -  O retorno deve conter dados suficientes para a construção de um gráfico de rentabilidade.
+[X] - Feriados e finais de semana não precisam ser pontos no gráfico, o mais comum é simplesmente ocultá-los e/ou ignorá-los
+
 
 Cálculo da Rentabilidade da Carteira Dia a Dia
 [] -  O sistema deve fornecer um endpoint que receba uma lista de ativos (tickers) e seus respectivos pesos.

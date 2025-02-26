@@ -7,9 +7,9 @@ export class GetAllAssetInfosUseCase {
     const assets = await this.assetInfoRepository.getAll();
   
     const data = assets.map((asset) => ({
-      asset_code: asset.asset_code,
-      category: asset.category,
-      tag: asset.tag
+      codigoAtivo: asset.asset_code,
+      classe: asset.category,
+      etiqueta: asset.tag
     }));
     
     return data;
