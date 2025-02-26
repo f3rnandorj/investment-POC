@@ -231,7 +231,7 @@ async function importData() {
     }
   }
   
-  console.log("Inserção finalizada...");
+  console.log("✅ Processo concluído com sucesso!");
   await prisma.$disconnect();
 }
 
