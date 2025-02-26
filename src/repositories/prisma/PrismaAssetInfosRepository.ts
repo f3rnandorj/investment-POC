@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
-import { AssetInfosRepository } from "../AssetInfosRepository";
+import { AssetInfoBaseRepository } from "../base/AssetInfoBaseRepository";
 
-export class PrismaAssetInfosRepository implements AssetInfosRepository {
+export class PrismaAssetInfoRepository implements AssetInfoBaseRepository {
   async getAll() {
     return await prisma.assetInfo.findMany();
   }

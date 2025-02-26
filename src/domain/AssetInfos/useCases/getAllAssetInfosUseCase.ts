@@ -1,10 +1,10 @@
-import { AssetInfosRepository } from "@/repositories/AssetInfosRepository";
+import { AssetInfoBaseRepository } from "@/repositories";
 
 export class GetAllAssetInfosUseCase {
-  constructor(private assetInfosRepository: AssetInfosRepository) {}
+  constructor(private assetInfoRepository: AssetInfoBaseRepository) {}
 
   async execute() {
-    const assets = await this.assetInfosRepository.getAll();
+    const assets = await this.assetInfoRepository.getAll();
   
     const data = assets.map((asset) => ({
       asset_code: asset.asset_code,

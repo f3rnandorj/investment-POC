@@ -1,1 +1,2 @@
-export * from "./controlles/getAllAssetInfos";
+export * from "./controller/getAllAssetInfosController";
+export * from "./useCases/getAllAssetInfosUseCase";

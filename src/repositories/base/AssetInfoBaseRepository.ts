@@ -1,5 +1,5 @@
 import { AssetInfo } from "@prisma/client";
 
-export interface AssetInfosRepository {
+export interface AssetInfoBaseRepository {
   getAll: () => Promise<AssetInfo[]>
 }
