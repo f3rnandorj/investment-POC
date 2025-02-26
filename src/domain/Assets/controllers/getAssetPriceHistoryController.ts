@@ -2,6 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { GetAssetPriceHistoryUseCase } from "../useCases/getAssetPriceHistoryUseCase";
 import { PrismaAssetRepository, PrismaCDIRepository } from "@/repositories";
+import { AssetNotFindError } from "@/errors";
 
 export async function getAssetPriceHistoryController(request: FastifyRequest, reply: FastifyReply) {
   const paramsSchema = z.object({
@@ -19,6 +20,10 @@ export async function getAssetPriceHistoryController(request: FastifyRequest, re
 
     return reply.status(200).send(data);
   } catch (err) {
-    return reply.status(409).send({ message: "Cannot find asset" });
+    if(err instanceof AssetNotFindError) {
+      reply.status(404).send({ message: err.message });
+    }
+
+    throw err;
   }
 }

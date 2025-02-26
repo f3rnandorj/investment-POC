@@ -1,3 +1,4 @@
+import { AssetNotFindError } from "@/errors";
 import { prisma } from "@/lib/prisma";
 import { AssetBaseRepository, CDIBaseRepository } from "@/repositories";
 import { dateUtils } from "@/utils";
@@ -21,8 +22,7 @@ export class GetAssetPriceHistoryUseCase {
     const asset = await this.assetRepository.getBySymbol(ticker);
 
     if (!asset || typeof asset?.priceHistory !== "string") {
-      // return reply.status(404).send({ message: "Ativo não encontrado" });
-      return;
+      throw new AssetNotFindError();
     }
     
     const cdiHistory = await this.CDIRepository.getAll();

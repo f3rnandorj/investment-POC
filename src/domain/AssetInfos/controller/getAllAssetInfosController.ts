@@ -12,6 +12,6 @@ export async function getAllAssetInfosController(request: FastifyRequest, reply:
 
     return reply.status(200).send(data);
   } catch (err) {
-    return reply.status(409).send();
+    throw err;
   }
 }
