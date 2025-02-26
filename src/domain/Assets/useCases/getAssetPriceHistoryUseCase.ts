@@ -14,19 +14,16 @@ interface PriceHistory {
 export class GetAssetPriceHistoryUseCase {
   constructor(
     private assetRepository: AssetBaseRepository, 
-    private CDIRepository: CDIBaseRepository
   ) {}
 
   async execute(ticker: string) {
     const asset = await this.assetRepository.getBySymbol(ticker);
   
-    if (!asset || typeof asset?.priceHistory !== "string") {
+    if (!asset || typeof asset?.price_history !== "string") {
       throw new AssetNotFindError();
     }
-  
-    const cdiHistory = await this.CDIRepository.getAll();
     
-    const priceHistory: PriceHistory[] = JSON.parse(asset.priceHistory);
+    const priceHistory: PriceHistory[] = JSON.parse(asset.price_history);
   
     const priceHistoryFiltered = dateUtils.removeNotBusinessDays(priceHistory
       .map((assetPrice) => ({
@@ -34,17 +31,10 @@ export class GetAssetPriceHistoryUseCase {
         close_price: assetPrice.close_price,
       })), "date");
   
-    const cdiHistoryFiltered = dateUtils.removeNotBusinessDays(cdiHistory
-      .map((cdiPrice) => ({
-        date: dateUtils.convertToISODate(cdiPrice.date),
-        close_price: cdiPrice.rate,
-      })), "date");
-  
     const data = {
       ticker: asset.symbol,
       name: asset.long_name,
       priceHistory: priceHistoryFiltered,
-      cdiHistory: cdiHistoryFiltered,
     };
   
     return data;

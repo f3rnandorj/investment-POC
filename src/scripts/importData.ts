@@ -181,7 +181,7 @@ async function importData() {
         modelName = ModelNames.CDI;
         jsonData = jsonData.map((item: NativeCDI) => ({
           date: item.data,
-          rate: item.valor,
+          rate: Number(item.valor),
         }));
       } else {
         modelName = ModelNames.ASSET;

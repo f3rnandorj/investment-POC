@@ -41,7 +41,7 @@ CREATE TABLE "asset_infos" (
 CREATE TABLE "cdis" (
     "id" SERIAL NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
-    "rate" TEXT NOT NULL,
+    "rate" DOUBLE PRECISION NOT NULL,
 
     CONSTRAINT "cdis_pkey" PRIMARY KEY ("id")
 );

@@ -47,7 +47,7 @@ model AssetInfo {
 model Cdi {
   id   Int      @id @default(autoincrement())
   date DateTime @unique
-  rate String
+  rate Float
 
   @@map("cdis")
 }
