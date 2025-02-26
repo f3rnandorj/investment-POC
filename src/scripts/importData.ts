@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import csv from "csv-parser";
 import xlsx from "xlsx";
-import { PrismaClient } from "@prisma/client";
+import { Asset, Prisma, PrismaClient } from "@prisma/client";
 import { dateUtils } from "../utils/dateUtils";
 // import { env } from "../env";
 
@@ -100,57 +100,73 @@ async function parseXLSX(filePath: string): Promise<Record<string, unknown>[]> {
   return xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
 }
 
-async function insertData( modelName: ModelNames, data: any) {
+async function insertData(modelName: ModelNames, dataArray: any[]) {
+  const batchSize = 500; 
+
   switch (modelName) {
   case ModelNames.ASSET_INFO:
-    await prisma.assetInfo.create({ data });
-    break;
-  case ModelNames.CDI:
-    await prisma.cdi.create({
-      data: {
-        date: dateUtils.convertToISODate(data.date),
-        rate: data.rate
-      } 
+    await prisma.assetInfo.createMany({
+      data: dataArray,
     });
     break;
-  case ModelNames.ASSET:
-    { const asset = await prisma.asset.create({
-      data: {
-        symbol: data.symbol,
-        long_name: data.long_name,
-        short_name: data.short_name,
-        exchange_name: data.exchange_name,
-        full_exchange_name: data.full_exchange_name,
-        instrument_type: data.instrument_type,
-        currency: data.currency,
-        first_trade_date: data.first_trade_date,
-        regular_market_time: data.regular_market_time,
-        regular_market_price: data.regular_market_price,
-        fifty_two_week_high: data.fifty_two_week_high,
-        fifty_two_week_low: data.fifty_two_week_low,
-        regular_market_day_high: data.regular_market_day_high,
-        regular_market_day_low: data.regular_market_day_low,
-        regular_market_volume: data.regular_market_volume,
-        previous_close: data.previous_close,
-      },
-    });
 
-    if (data.price_history?.create?.length) {
-      await prisma.priceHistory.createMany({
-        data: data.price_history.create.map((history: any) => ({
-          asset_id: asset.id, // Agora temos o ID do Asset para vincular
-          timestamp: history.timestamp,
-          open_price: history.open_price ?? 0,
-          high_price: history.high_price ?? 0,
-          low_price: history.low_price ?? 0,
-          close_price: history.close_price ?? 0,
-          volume: history.volume ?? 0,
+  case ModelNames.CDI:
+    for (let i = 0; i < dataArray.length; i += batchSize) {
+      await prisma.cdi.createMany({
+        data: dataArray.slice(i, i + batchSize).map((data) => ({
+          date: dateUtils.convertToISODate(data.date),
+          rate: data.rate,
         })),
       });
     }
-    }
-
     break;
+
+  case ModelNames.ASSET:{
+    const createdAssets: any[] = [];
+    
+    for (const data of dataArray) {
+      const asset = await prisma.asset.create({
+        data: {
+          symbol: data.symbol,
+          long_name: data.long_name,
+          short_name: data.short_name,
+          exchange_name: data.exchange_name,
+          full_exchange_name: data.full_exchange_name,
+          instrument_type: data.instrument_type,
+          currency: data.currency,
+          first_trade_date: data.first_trade_date,
+          regular_market_time: data.regular_market_time,
+          regular_market_price: data.regular_market_price,
+          fifty_two_week_high: data.fifty_two_week_high,
+          fifty_two_week_low: data.fifty_two_week_low,
+          regular_market_day_high: data.regular_market_day_high,
+          regular_market_day_low: data.regular_market_day_low,
+          regular_market_volume: data.regular_market_volume,
+          previous_close: data.previous_close,
+        },
+      });
+    
+      createdAssets.push({ id: asset.id, priceHistory: data.price_history?.create || [] });
+    }
+    
+    const priceHistoryData = createdAssets.flatMap(({ id, priceHistory }) => priceHistory.map((history: any) => ({
+      asset_id: id, 
+      timestamp: history.timestamp,
+      open_price: history.open_price ?? 0,
+      high_price: history.high_price ?? 0,
+      low_price: history.low_price ?? 0,
+      close_price: history.close_price ?? 0,
+      volume: history.volume ?? 0,
+    })));
+    
+    for (let i = 0; i < priceHistoryData.length; i += batchSize) {
+      await prisma.priceHistory.createMany({
+        data: priceHistoryData.slice(i, i + batchSize),
+      });
+    }
+  }
+    break;
+
   default:
     throw new Error(`Model "${modelName}" not recognized.`);
   }
@@ -162,23 +178,20 @@ async function importData() {
   for (const file of files) {
     const filePath = path.join(DATA_FOLDER, file);
     let jsonData: any[] = [];
-    
-    // if (file.endsWith(".json")) {
-    //   jsonData = [JSON.parse(fs.readFileSync(filePath, "utf-8"))];
-    // } else 
-    if (file.endsWith(".csv")) {
+    let modelName: ModelNames | null = null; 
+
+    if (file.endsWith(".json")) {
+      jsonData = [JSON.parse(fs.readFileSync(filePath, "utf-8"))];
+    } else if (file.endsWith(".csv")) {
       jsonData = await parseCSV(filePath);
-    } 
-    // else if (file.endsWith(".xlsx")) {
-    //   jsonData = await parseXLSX(filePath);
-    // }
+    } else if (file.endsWith(".xlsx")) {
+      jsonData = await parseXLSX(filePath);
+    }
 
-    if (jsonData.length > 0 ) {
-      let modelName: ModelNames;
-
+    if (jsonData.length > 0) {
       if (file.startsWith("ativos")) {
         modelName = ModelNames.ASSET_INFO;
-        jsonData = jsonData.map((item: NativeAssetItem) => ({          
+        jsonData = jsonData.map((item: NativeAssetItem) => ({
           asset_code: item.codigoAtivo,
           name: item.nome,
           description: item.descricao,
@@ -191,8 +204,8 @@ async function importData() {
       } else if (file.startsWith("CDI")) {
         modelName = ModelNames.CDI;
         jsonData = jsonData.map((item: NativeCDI) => ({
-          date: new Date(item.data),
-          rate: parseFloat(item.valor),
+          date: item.data,
+          rate: item.valor,
         }));
       } else {
         modelName = ModelNames.ASSET;
@@ -213,7 +226,7 @@ async function importData() {
           regular_market_day_low: item.chart?.result?.[0]?.meta?.regularMarketDayLow,
           regular_market_volume: item.chart?.result?.[0]?.meta?.regularMarketVolume,
           previous_close: item.chart?.result?.[0]?.meta?.previousClose,
-          
+
           price_history: {
             create: item.chart?.result?.[0]?.timestamp?.map((ts: number, index: number) => ({
               timestamp: ts,
@@ -226,25 +239,22 @@ async function importData() {
           },
         }));
       }
+    }
 
-      for (const data of jsonData) {
-        try {
-          await insertData(modelName, data);
-          
-          if(jsonData.length === jsonData.length) {
-            console.log(`Inserted ${jsonData.length} records into ${modelName}`);
-          }
-        } catch (error) {
-          console.log(error);
-        }
+    if (modelName) {
+      try {
+        console.log("Aguarde enquanto estamos inserindo as dados no banco...");
+        
+        await insertData(modelName, jsonData);
+
+        console.log(`Inserted ${jsonData.length} records into ${modelName}`);
+      } catch (error) {
+        console.error(`Error inserting data into ${modelName}:`, error);
       }
     }
   }
-  // await prisma.asset.deleteMany({});
-  // await prisma.priceHistory.deleteMany({});
-  // await prisma.assetInfo.deleteMany({});
-  // await prisma.cdi.deleteMany({});
-
+  
+  console.log("Inserção finalizada...");
   await prisma.$disconnect();
 }
 
