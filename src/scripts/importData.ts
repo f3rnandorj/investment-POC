@@ -135,7 +135,7 @@ async function insertData(modelName: ModelNames, dataArray: any[]) {
           regular_market_volume: assetItem.regular_market_volume,
           previous_close: assetItem.previous_close,
 
-          priceHistory: assetItem.priceHistory
+          price_history: assetItem.price_history
         },
       });
     }
@@ -203,18 +203,15 @@ async function importData() {
           regular_market_volume: item.chart.result[0].meta.regularMarketVolume,
           previous_close: item.chart.result[0].meta.previousClose,
 
-          priceHistory: JSON.stringify(
-            item.chart.result[0].timestamp?.map((ts: number, index: number) => {
-              console.log(ts);
-              return({
-                timestamp: ts,
-                open_price: item.chart.result[0].indicators.quote[0].open?.[index] ?? null,
-                high_price: item.chart.result[0].indicators.quote[0].high?.[index] ?? null,
-                low_price: item.chart.result[0].indicators.quote[0].low?.[index] ?? null,
-                close_price: item.chart.result[0].indicators.quote[0].close?.[index] ?? null,
-                volume: item.chart.result[0].indicators.quote[0].volume?.[index] ?? null
-              });
-            }) ?? []
+          price_history: JSON.stringify(
+            item.chart.result[0].timestamp?.map((ts: number, index: number) => ({
+              timestamp: ts,
+              open_price: item.chart.result[0].indicators.quote[0].open?.[index] ?? null,
+              high_price: item.chart.result[0].indicators.quote[0].high?.[index] ?? null,
+              low_price: item.chart.result[0].indicators.quote[0].low?.[index] ?? null,
+              close_price: item.chart.result[0].indicators.quote[0].close?.[index] ?? null,
+              volume: item.chart.result[0].indicators.quote[0].volume?.[index] ?? null
+            })) ?? []
           )
         }));
 

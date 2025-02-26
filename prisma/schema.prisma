@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model Asset {
-  id                      String @id @default(auto()) @map("_id") @db.ObjectId
+  id                      Int    @id @default(autoincrement())
   symbol                  String @unique
   long_name               String
   short_name              String
@@ -31,7 +31,7 @@ model Asset {
 }
 
 model AssetInfo {
-  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  id           Int    @id @default(autoincrement())
   asset_code   String @unique
   name         String
   description  String
@@ -45,7 +45,7 @@ model AssetInfo {
 }
 
 model Cdi {
-  id   String   @id @default(auto()) @map("_id") @db.ObjectId
+  id   Int      @id @default(autoincrement())
   date DateTime @unique
   rate String
 
