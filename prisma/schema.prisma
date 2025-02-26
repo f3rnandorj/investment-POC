@@ -26,6 +26,8 @@ model Asset {
   regular_market_volume   Int
   previous_close          Float?
   price_history           PriceHistory[]
+
+  @@map("assets")
 }
 
 model PriceHistory {
@@ -39,6 +41,8 @@ model PriceHistory {
   volume      Int
   Asset       Asset?  @relation(fields: [assetId], references: [id])
   assetId     String? @db.ObjectId
+
+  @@map("price_histories")
 }
 
 model AssetInfo {
@@ -51,10 +55,14 @@ model AssetInfo {
   type         String
   subtype      String
   bovespa_name String
+
+  @@map("asset_infos")
 }
 
 model Cdi {
   id   String   @id @default(auto()) @map("_id") @db.ObjectId
   date DateTime @unique
   rate String
+
+  @@map("cdis")
 }
