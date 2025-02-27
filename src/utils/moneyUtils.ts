@@ -17,6 +17,7 @@ function calculateReturns(
     .filter((entry) => entry.close_price !== undefined)
     .filter((entry) => entry.date >= startDate && entry.date <= endDate)
     .sort((a, b) => a.date.getTime() - b.date.getTime());
+  console.log( filteredPriceHistory );
 
   const filteredCDIHistory = CDIPriceHistory
     .filter((entry) => entry.date >= startDate && entry.date <= endDate)

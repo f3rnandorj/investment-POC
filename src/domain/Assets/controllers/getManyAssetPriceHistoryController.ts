@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
-import { PrismaAssetRepository } from "@/repositories";
+import { PrismaAssetRepository, PrismaCDIRepository } from "@/repositories";
 import { AssetNotFindError } from "@/errors";
 import { GetManyAssetPriceHistoryUseCase } from "../useCases/getManyAssetPriceHistoryUseCase";
 
@@ -16,8 +16,9 @@ export async function getManyAssetPriceHistoryController(request: FastifyRequest
   try {
     const { tickers, startDate, endDate } = paramsSchema.parse(request.query);
 
+    const prismaCDIRepository = new PrismaCDIRepository();
     const prismaAssetRepository = new PrismaAssetRepository();
-    const getAssetPriceHistoryUseCase = new GetManyAssetPriceHistoryUseCase(prismaAssetRepository);
+    const getAssetPriceHistoryUseCase = new GetManyAssetPriceHistoryUseCase(prismaAssetRepository, prismaCDIRepository);
 
     const data = await getAssetPriceHistoryUseCase.execute({ tickers, startDate, endDate });
 

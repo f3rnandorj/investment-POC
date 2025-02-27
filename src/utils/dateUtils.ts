@@ -48,5 +48,5 @@ function removeNotBusinessDays<T>(dataArray: T[], dateKey: keyof T): T[] {
 export const dateUtils = {
   convertToISODate,
   formatTimestamp,
-  removeNotBusinessDays
+  removeNotBusinessDays,
 };

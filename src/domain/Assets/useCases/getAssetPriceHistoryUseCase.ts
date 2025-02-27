@@ -26,18 +26,18 @@ export class GetAssetPriceHistoryUseCase {
   ) {}
 
   async execute({ ticker, endDate, startDate }: GetAssetPriceHistoryUseCaseRequest): Promise<GetAssetPriceHistoryUseCaseResponse> {
-    const { removeNotBusinessDays } = dateUtils;
-
-    const startDateFormatted = startDate ? new Date(startDate) : null;
-    const endDateFormatted = endDate ? new Date(endDate) : null;
+    const { removeNotBusinessDays, convertToISODate } = dateUtils;
+    
+    const startDateFormatted = startDate ? convertToISODate(startDate) as Date : null;
+    const endDateFormatted = endDate ? convertToISODate(endDate) as Date : null;
 
     const asset = await this.assetRepository.getBySymbol(ticker);
+
+    const CDIPriceHistory = await this.CDIRepository.getAll();
   
     if (!asset || typeof asset?.price_history !== "string") {
       throw new AssetNotFindError();
     }
-
-    const CDIPriceHistory = await this.CDIRepository.getAll();
     
     const priceHistory: PriceHistory[] = JSON.parse(asset.price_history);
 
@@ -57,5 +57,4 @@ export class GetAssetPriceHistoryUseCase {
   
     return data;
   }
-  
 }
