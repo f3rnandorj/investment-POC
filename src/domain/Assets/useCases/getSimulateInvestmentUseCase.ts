@@ -1,8 +1,7 @@
-import { AssetBaseRepository, CDIBaseRepository } from "@/repositories";
+import { AssetBaseRepository } from "@/repositories";
 import { dateUtils, moneyUtils } from "@/utils";
 import { PriceHistory } from "../AssetTypes";
-import { prisma } from "@/lib/prisma";
-import { EmptyPriceHistoryError, AssetNotFindError, InvalidPriceDataError, CDIRateNotFoundError } from "@/errors";
+import { AssetNotFindError, } from "@/errors";
 
 interface GetSimulateInvestmentUseCaseRequest {
   ticker: string;

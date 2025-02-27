@@ -1,61 +1,18 @@
-import { PriceHistory, ReturnProfitabilityData } from "@/domain";
-import {
-  addBusinessDays,
-  differenceInBusinessDays,
-  format,
-  parseISO,
-} from "date-fns";
+interface CalculateDailyProfitabilityParams {
+price: number | undefined;
+previousPrice :number | undefined;
+} 
 
-type CDIHistory = {
-  id: number;
-  date: Date;
-  rate: number;
-}[];
+function calculateDailyProfitability({ price, previousPrice }: CalculateDailyProfitabilityParams): number | null {
+  if (price === undefined || previousPrice === undefined) {
+    return null; 
+  }
 
-interface CalculateProfitability {
-  priceHistoryFiltered: PriceHistory[];
-  CDIPriceHistory?: CDIHistory;
-
+  return ((price / previousPrice) - 1) * 100; 
 }
 
-function calculateProfitability(
-  { priceHistoryFiltered, CDIPriceHistory }: CalculateProfitability
-) {
-
-  let accumulatedReturnTicker = 1;
-  let accumulatedReturnCDI = 1;
-
-  const tickerReturns: ReturnProfitabilityData = [];
-  const cdiReturns: ReturnProfitabilityData = [];
-
-  for (let i = 1; i < priceHistoryFiltered.length; i++) {
-    const prev = priceHistoryFiltered[i - 1];
-    const current = priceHistoryFiltered[i];
-      
-    if (prev.close_price && current.close_price) {
-      const dailyReturn = (current.close_price - prev.close_price) / prev.close_price;
-      accumulatedReturnTicker *= (1 + dailyReturn);
-          
-      tickerReturns.push({
-        date: current.date,
-        accumulated_return: accumulatedReturnTicker - 1,
-      });
-    }
-  }
-
-  if(CDIPriceHistory && CDIPriceHistory.length > 0) {
-    for (let i = 0; i < CDIPriceHistory.length; i++) {
-      const dailyReturn = CDIPriceHistory[i].rate / 100;
-      accumulatedReturnCDI *= (1 + dailyReturn);
-        
-      cdiReturns.push({
-        date: CDIPriceHistory[i].date,
-        accumulated_return: accumulatedReturnCDI - 1,
-      });
-    }
-  }
-
-  return { tickerReturns, cdiReturns };
+function calculateCDIProfitability(price: number): number {
+  return (price / 100) + 1 ; 
 }
 
 type SimulationParams = {
@@ -98,6 +55,7 @@ function calculateSimulation({
 }
 
 export const moneyUtils = {
-  calculateProfitability, 
-  calculateSimulation
+  calculateDailyProfitability, 
+  calculateSimulation,
+  calculateCDIProfitability
 };
