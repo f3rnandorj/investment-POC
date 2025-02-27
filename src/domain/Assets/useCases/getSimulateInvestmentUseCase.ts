@@ -1,5 +1,5 @@
 import { AssetBaseRepository, CDIBaseRepository } from "@/repositories";
-import { dateUtils } from "@/utils";
+import { dateUtils, moneyUtils } from "@/utils";
 import { PriceHistory } from "../AssetTypes";
 import { prisma } from "@/lib/prisma";
 import { EmptyPriceHistoryError, AssetNotFindError, InvalidPriceDataError, CDIRateNotFoundError } from "@/errors";
@@ -9,91 +9,77 @@ interface GetSimulateInvestmentUseCaseRequest {
   startDate: string;
   endDate: string;
   investment: string;
+  frequency?: "daily" | "monthly" | "yearly"; 
 }
 
 interface GetSimulateInvestmentUseCaseResponse {
-  investedAmount: number;
-  finalValueAsset: number;
-  finalValueCDI: number;
-  assetReturn: number;
-  cdiReturn: number;
-};
+  simulationReturn: number;
+  initialInvestment: number;
+  frequency: "daily" | "monthly" | "yearly"; 
+}
 
 export class GetSimulateInvestmentUseCase {
   constructor(
-    private assetRepository: AssetBaseRepository, 
-    private CDIRepository: CDIBaseRepository
+    private assetRepository: AssetBaseRepository
   ) {}
 
-  async execute(
-    { endDate, investment, startDate, ticker } :GetSimulateInvestmentUseCaseRequest
-  ): Promise<GetSimulateInvestmentUseCaseResponse> {
+  async execute({
+    endDate,
+    startDate,
+    investment,
+    ticker, 
+    frequency
+  }: GetSimulateInvestmentUseCaseRequest): Promise<GetSimulateInvestmentUseCaseResponse> {
+    const { removeNotBusinessDays, convertToISODate, filterArrayByDate } = dateUtils;
+    const { calculateSimulation } = moneyUtils;
+
+    const startDateFormatted = startDate ? convertToISODate(startDate) as Date : null;
+    const endDateFormatted = endDate ? convertToISODate(endDate) as Date : null;
+    
     const asset = await this.assetRepository.getBySymbol(ticker);
-      
+
     if (!asset || typeof asset?.price_history !== "string") {
       throw new AssetNotFindError();
     }
-        
+
     const priceHistory: PriceHistory[] = JSON.parse(asset.price_history);
-    
-    const priceHistoryFiltered = dateUtils.removeNotBusinessDays(
+
+    const priceHistoryFiltered = removeNotBusinessDays(
       priceHistory
         .map((assetPrice) => ({
-          date: dateUtils.formatTimestamp(assetPrice.timestamp),
+          date: new Date(assetPrice.date), 
           close_price: assetPrice.close_price,
-        }))
-        .filter((item) => {
-          const date = dateUtils.convertToISODate(item.date);
-          return (
-            (!startDate || date >= new Date(startDate)) &&
-                  (!endDate || date <= new Date(endDate))
-          );
-        }),
+        })),        
       "date"
     );
 
-    const CDIPriceHistory = await this.CDIRepository.getAll();
+    const start = startDateFormatted ? startDateFormatted : priceHistoryFiltered[0].date;
+    const end = endDateFormatted ? endDateFormatted : priceHistoryFiltered[priceHistoryFiltered.length -1].date;
 
-    if (priceHistoryFiltered.length === 0) {
-      throw new EmptyPriceHistoryError();
-    }
-
-    const initialPrice = priceHistoryFiltered[0].close_price;
-    const finalPrice = priceHistoryFiltered[priceHistoryFiltered.length - 1].close_price;
-
-    if (initialPrice === undefined || finalPrice === undefined) {
-      throw new InvalidPriceDataError();
-    }
-
-    const assetReturn = (finalPrice - initialPrice) / initialPrice;
-  
-    const _startDate = dateUtils.convertToISODate(priceHistoryFiltered[0].date);
-    const _endDate = dateUtils.convertToISODate(priceHistoryFiltered[priceHistoryFiltered.length - 1].date);
-
-    const filteredCDI = CDIPriceHistory.filter((cdi) => {
-      const cdiDate = cdi.date;
-      return cdiDate >= _startDate && cdiDate <= _endDate;
+    const filteredByDatePriceHistory = filterArrayByDate({
+      array: priceHistoryFiltered,
+      startDate: start,
+      endDate: end,
+      filterUndefinedField: "close_price",
     });
 
-    if (filteredCDI.length === 0) {
-      throw new CDIRateNotFoundError();
-    }
+    const data = moneyUtils.calculateProfitability({ priceHistoryFiltered: filteredByDatePriceHistory });
 
-    let cdiReturn = 1;
-    for (const cdi of filteredCDI) {
-      cdiReturn *= 1 + cdi.rate / 100; 
-    }
-    cdiReturn -= 1;
+    const { tickerReturns } = data;
 
-    const finalValueAsset = Number(investment) * (1 + assetReturn);
-    const finalValueCDI = Number(investment) * (1 + cdiReturn);
+    const profitability = tickerReturns[tickerReturns.length -1].accumulated_return;
+
+    const _frequency = frequency || "daily";
+    const initialInvestment = Number(investment);
+
+    const simulationReturn = calculateSimulation({
+      startDate:start, endDate: end, investment: initialInvestment, profitability, frequency: _frequency
+    });
 
     return {
-      investedAmount: Number(investment),
-      finalValueAsset,
-      finalValueCDI,
-      assetReturn: assetReturn * 100, 
-      cdiReturn: cdiReturn * 100, 
+      initialInvestment,
+      simulationReturn,
+      frequency: _frequency,
     };
   }
 }

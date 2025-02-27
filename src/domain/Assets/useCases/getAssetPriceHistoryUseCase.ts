@@ -26,7 +26,7 @@ export class GetAssetPriceHistoryUseCase {
   ) {}
 
   async execute({ ticker, endDate, startDate }: GetAssetPriceHistoryUseCaseRequest): Promise<GetAssetPriceHistoryUseCaseResponse> {
-    const { removeNotBusinessDays, convertToISODate } = dateUtils;
+    const { removeNotBusinessDays, convertToISODate, filterArrayByDate } = dateUtils;
     
     const startDateFormatted = startDate ? convertToISODate(startDate) as Date : null;
     const endDateFormatted = endDate ? convertToISODate(endDate) as Date : null;
@@ -53,7 +53,20 @@ export class GetAssetPriceHistoryUseCase {
     const start = startDateFormatted ? startDateFormatted : priceHistoryFiltered[0].date;
     const end = endDateFormatted ? endDateFormatted : priceHistoryFiltered[priceHistoryFiltered.length -1].date;
 
-    const data = moneyUtils.calculateReturns(priceHistoryFiltered, CDIPriceHistory, start, end);
+    const filteredByDatePriceHistory = filterArrayByDate({
+      array: priceHistoryFiltered,
+      startDate: start,
+      endDate: end,
+      filterUndefinedField: "close_price",
+    });
+    
+    const filteredByDateCDIHistory = filterArrayByDate({
+      array: CDIPriceHistory || [],
+      startDate: start,
+      endDate: end,
+    });
+
+    const data = moneyUtils.calculateProfitability({ priceHistoryFiltered: filteredByDatePriceHistory, CDIPriceHistory: filteredByDateCDIHistory });
   
     return data;
   }

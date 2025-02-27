@@ -41,12 +41,35 @@ function removeNotBusinessDays<T>(dataArray: T[], dateKey: keyof T): T[] {
       throw new Error(`O valor em ${String(dateKey)} não é uma data válida.`);
     }
 
-    return isBusinessDay(date, "America/Sao_Paulo");
+    return isBusinessDay(date);
   });
+}
+
+type DateFilterParams<T> = {
+  array: T[];
+  startDate: Date;
+  endDate: Date;
+  filterUndefinedField?: keyof T; 
+};
+
+function filterArrayByDate<T extends { date: Date }>({
+  array,
+  startDate,
+  endDate,
+  filterUndefinedField,
+}: DateFilterParams<T>): T[] {
+  return array
+    .filter((entry) => {
+      const isWithinDateRange = entry.date >= startDate && entry.date <= endDate;
+      const isDefined = filterUndefinedField ? entry[filterUndefinedField] !== undefined : true;
+      return isWithinDateRange && isDefined;
+    })
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
 }
 
 export const dateUtils = {
   convertToISODate,
   formatTimestamp,
   removeNotBusinessDays,
+  filterArrayByDate
 };
