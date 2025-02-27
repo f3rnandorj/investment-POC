@@ -149,6 +149,7 @@ async function insertData(modelName: ModelNames, dataArray: any[]) {
 }
 
 async function importData() {
+  const { convertToISODate, formatTimestamp } = dateUtils; 
   const files = fs.readdirSync(DATA_FOLDER);
 
   for (const file of files) {
@@ -205,7 +206,7 @@ async function importData() {
 
           price_history: JSON.stringify(
             item.chart.result[0].timestamp?.map((ts: number, index: number) => ({
-              timestamp: ts,
+              date: convertToISODate(formatTimestamp(ts)),
               open_price: item.chart.result[0].indicators.quote[0].open?.[index] ?? null,
               high_price: item.chart.result[0].indicators.quote[0].high?.[index] ?? null,
               low_price: item.chart.result[0].indicators.quote[0].low?.[index] ?? null,

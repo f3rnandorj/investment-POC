@@ -1,5 +1,5 @@
 export interface PriceHistory {
-  timestamp: number;
+  date: Date;
   open_price?: number;
   high_price?: number;
   low_price?: number;

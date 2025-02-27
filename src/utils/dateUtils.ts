@@ -32,8 +32,14 @@ function formatTimestamp(timestamp: number): string {
 
 function removeNotBusinessDays<T>(dataArray: T[], dateKey: keyof T): T[] {
   return dataArray.filter((item) => {
-    const dateStr = item[dateKey] as unknown as string;
-    const date = new Date(dateStr);
+    const dateValue = item[dateKey];
+
+    // Verifica se o valor é uma string e converte para Date
+    const date = typeof dateValue === "string" ? new Date(dateValue) : dateValue;
+
+    if (!(date instanceof Date) || isNaN(date.getTime())) {
+      throw new Error(`O valor em ${String(dateKey)} não é uma data válida.`);
+    }
 
     return isBusinessDay(date, "America/Sao_Paulo");
   });

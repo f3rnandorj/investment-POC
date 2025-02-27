@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { GetAssetPriceHistoryUseCase } from "../useCases/getAssetPriceHistoryUseCase";
-import { PrismaAssetRepository } from "@/repositories";
+import { PrismaAssetRepository, PrismaCDIRepository } from "@/repositories";
 import { AssetNotFindError } from "@/errors";
 
 //EndpointEX http://localhost:3333/price-history?ticker=ALUG11&startDate=2023-01-01&endDate=2023-03-20
@@ -16,8 +16,9 @@ export async function getAssetPriceHistoryController(request: FastifyRequest, re
   try {
     const { ticker, startDate, endDate } = paramsSchema.parse(request.query);
 
+    const prismaCDIRepository = new PrismaCDIRepository();
     const prismaAssetRepository = new PrismaAssetRepository();
-    const getAssetPriceHistoryUseCase = new GetAssetPriceHistoryUseCase(prismaAssetRepository);
+    const getAssetPriceHistoryUseCase = new GetAssetPriceHistoryUseCase(prismaAssetRepository, prismaCDIRepository);
 
     const data = await getAssetPriceHistoryUseCase.execute({ ticker, startDate, endDate });
 
