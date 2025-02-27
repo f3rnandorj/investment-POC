@@ -8,13 +8,12 @@ interface GetSimulateInvestmentUseCaseRequest {
   startDate: string;
   endDate: string;
   investment: string;
-  frequency?: "daily" | "monthly" | "yearly"; 
 }
 
 interface GetSimulateInvestmentUseCaseResponse {
   simulationReturn: number;
   initialInvestment: number;
-  frequency: "daily" | "monthly" | "yearly"; 
+  daysAmount: number;
 }
 
 export class GetSimulateInvestmentUseCase {
@@ -27,10 +26,9 @@ export class GetSimulateInvestmentUseCase {
     startDate,
     investment,
     ticker, 
-    frequency
   }: GetSimulateInvestmentUseCaseRequest): Promise<GetSimulateInvestmentUseCaseResponse> {
     const { removeNotBusinessDays, convertToISODate, filterArrayByDate } = dateUtils;
-    const { calculateSimulation } = moneyUtils;
+    const { calculateSimulation, calculateDailyProfitability, calculateProfitabilityPeriod } = moneyUtils;
 
     const startDateFormatted = startDate ? convertToISODate(startDate) as Date : null;
     const endDateFormatted = endDate ? convertToISODate(endDate) as Date : null;
@@ -55,30 +53,38 @@ export class GetSimulateInvestmentUseCase {
     const start = startDateFormatted ? startDateFormatted : priceHistoryFiltered[0].date;
     const end = endDateFormatted ? endDateFormatted : priceHistoryFiltered[priceHistoryFiltered.length -1].date;
 
-    const filteredByDatePriceHistory = filterArrayByDate({
+    const priceHistoryFilteredByDate = filterArrayByDate({
       array: priceHistoryFiltered,
       startDate: start,
       endDate: end,
       filterUndefinedField: "close_price",
     });
 
-    const data = moneyUtils.calculateProfitability({ priceHistoryFiltered: filteredByDatePriceHistory });
+    const allProfitability = priceHistoryFilteredByDate
+      .map((asset, index, array) => {
+        const profitabilityDay = calculateDailyProfitability(
+          { 
+            price: asset.close_price,
+            previousPrice: index > 0 ? array[index - 1].close_price : undefined, 
+          }
+        );
 
-    const { tickerReturns } = data;
+        return profitabilityDay !== null
+          ? profitabilityDay 
+          : null; 
+      })
+      .filter((item) => item !== null);
 
-    const profitability = tickerReturns[tickerReturns.length -1].accumulated_return;
+    const totalOfDays = priceHistoryFilteredByDate.length;
 
-    const _frequency = frequency || "daily";
-    const initialInvestment = Number(investment);
+    const profitabilityPeriod = calculateProfitabilityPeriod(allProfitability);
 
-    const simulationReturn = calculateSimulation({
-      startDate:start, endDate: end, investment: initialInvestment, profitability, frequency: _frequency
-    });
+    const simulationReturn = calculateSimulation({ totalOfDays, initialInvestment: Number(investment), profitabilityPeriod });
 
     return {
-      initialInvestment,
+      initialInvestment: Number(investment),
       simulationReturn,
-      frequency: _frequency,
+      daysAmount: totalOfDays
     };
   }
 }

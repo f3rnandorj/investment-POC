@@ -7,7 +7,7 @@ import { GetSimulateInvestmentUseCase } from "../useCases/getSimulateInvestmentU
 
 // or
 
-// EndpointEX http://localhost:3333/simulate-investment?ticker=ALUG11&startDate=01/01/2024&endDate=01/02/2024&investment=1000&frequency=monthly
+// EndpointEX http://localhost:3333/simulate-investment?ticker=ALUG11&startDate=01/01/2024&endDate=01/02/2024&investment=1000
 
 export async function getSimulateInvestmentController(request: FastifyRequest, reply: FastifyReply) {
   const paramsSchema = z.object({
@@ -15,16 +15,15 @@ export async function getSimulateInvestmentController(request: FastifyRequest, r
     startDate: z.string(),
     endDate: z.string(),
     investment: z.string(),
-    frequency: z.enum(["daily", "monthly", "yearly"]).optional(),
   });
 
   try {
-    const { ticker, startDate, endDate, investment, frequency } = paramsSchema.parse(request.query);
+    const { ticker, startDate, endDate, investment } = paramsSchema.parse(request.query);
 
     const prismaAssetRepository = new PrismaAssetRepository();
     const simulateInvestmentUseCase = new GetSimulateInvestmentUseCase(prismaAssetRepository);
 
-    const result = await simulateInvestmentUseCase.execute({ ticker, startDate, endDate, investment, frequency });
+    const result = await simulateInvestmentUseCase.execute({ ticker, startDate, endDate, investment });
 
     return reply.status(200).send(result);
   } catch (err) {
