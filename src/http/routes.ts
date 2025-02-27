@@ -1,5 +1,5 @@
 
-import { getAllAssetInfosController, getAssetPriceHistoryController, getManyAssetPriceHistoryController } from "@/domain";
+import { getAllAssetInfosController, getAssetPriceHistoryController, getManyAssetPriceHistoryController, getSimulateInvestmentController } from "@/domain";
 import { FastifyInstance } from "fastify";
 
 export async function appRoutes(app: FastifyInstance) {
@@ -8,4 +8,6 @@ export async function appRoutes(app: FastifyInstance) {
   app.get("/price-history", getAssetPriceHistoryController);
 
   app.get("/wallet-price-history", getManyAssetPriceHistoryController);
+
+  app.get("/simulate-investment", getSimulateInvestmentController);
 }

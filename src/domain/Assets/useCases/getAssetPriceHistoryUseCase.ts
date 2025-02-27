@@ -23,7 +23,7 @@ export class GetAssetPriceHistoryUseCase {
     private assetRepository: AssetBaseRepository, 
   ) {}
 
-  async execute({ ticker,endDate, startDate }: GetAssetPriceHistoryUseCaseRequest): Promise<GetAssetPriceHistoryUseCaseResponse> {
+  async execute({ ticker, endDate, startDate }: GetAssetPriceHistoryUseCaseRequest): Promise<GetAssetPriceHistoryUseCaseResponse> {
     const asset = await this.assetRepository.getBySymbol(ticker);
   
     if (!asset || typeof asset?.price_history !== "string") {

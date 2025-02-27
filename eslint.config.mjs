@@ -26,7 +26,8 @@ export default [
       "arrow-parens": ["error", "always"],
       "arrow-body-style": ["error", "as-needed"],
       "prefer-template": "error",
-      "no-useless-catch": "off"
+      "no-useless-catch": "off",
+      "comma-spacing": ["error", { "before": false, "after": true }]
     }
   },
 ];

@@ -23,7 +23,7 @@ export class GetManyAssetPriceHistoryUseCase {
     private assetRepository: AssetBaseRepository,
   ) {}
 
-  async execute({ tickers,endDate,startDate }:GetManyAssetPriceHistoryUseCaseRequest): Promise<GetManyAssetPriceHistoryUseCaseResponse[]> {
+  async execute({ tickers, endDate, startDate }:GetManyAssetPriceHistoryUseCaseRequest): Promise<GetManyAssetPriceHistoryUseCaseResponse[]> {
     const assets = await this.assetRepository.getManyBySymbol(tickers);
 
     const data = assets.map((asset) => {
