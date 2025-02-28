@@ -8,7 +8,7 @@ let inMemoryCDIRepository: InMemoryCDIRepository;
 let inMemoryAssetRepository: InMemoryAssetRepository;
 let sut: GetAssetPriceHistoryUseCase;
 
-describe("GetAssetPriceHistoryUseCase", () => {
+describe("GetAssetPriceHistory Use Case", () => {
   beforeEach(() => {
     inMemoryCDIRepository = new InMemoryCDIRepository();
     inMemoryAssetRepository = new InMemoryAssetRepository();

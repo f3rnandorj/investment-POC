@@ -82,6 +82,11 @@ Abra o Docker Dashboard para verificar se todos os containers foram criados.
 
 ---
 
+## Inicializando o backend
+```shell script
+yarn start:dev
+```
+
 **Pronto! A API está pronta para ser utilizada! 🥳**
 
 Aplicações | URL | User | Password

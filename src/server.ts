@@ -1,12 +1,5 @@
 import { app } from "./app";
 import { env } from "./env";
-import { prisma } from "./lib/prisma";
-
-async function clearDatabase() {
-  await prisma.asset.deleteMany({});
-  await prisma.assetInfo.deleteMany({});
-  await prisma.cdi.deleteMany({});
-}
 
 app
   .listen({
@@ -15,5 +8,4 @@ app
   })
   .then(async () => {
     console.log("HTTP server running");
-    // await clearDatabase();
   });
