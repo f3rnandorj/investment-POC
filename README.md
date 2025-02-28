@@ -1,44 +1,105 @@
-# investo-challenge
+# Configuração de Ambiente
 
-Requisitos Funcionais (RFs)
-Consulta de Ativos Disponíveis para Simulação
-[X] -  O sistema deve disponibilizar um endpoint para consulta de ativos disponíveis.
-[X] -  A resposta deve conter, no mínimo, os campos: codigoAtivo, classe e etiqueta.
+## Instalar o docker
 
-Consulta de Rentabilidade de Índice Dia a Dia
-[] -  O sistema deve fornecer um endpoint que receba o ticker de um ativo e retorne a rentabilidade diária.
-[] -  O retorno deve conter dados suficientes para a construção de um gráfico de rentabilidade.
-[X] - Feriados e finais de semana não precisam ser pontos no gráfico, o mais comum é simplesmente ocultá-los e/ou ignorá-los
+https://www.docker.com/
 
+## Clonando repositorio e navegando para o projeto
+```shell script
+git clone https://github.com/f3rnandorj/investo-challenge && cd ..
+```
 
-Cálculo da Rentabilidade da Carteira Dia a Dia
-[] -  O sistema deve fornecer um endpoint que receba uma lista de ativos (tickers) e seus respectivos pesos.
-[] -  O endpoint deve retornar a rentabilidade diária da carteira, permitindo a construção de gráficos.
+## Instalar dependências de desenvolvimento
+```shell script
+yarn
+```
 
-Filtro de Rentabilidade por Período
-[] -  Todos os endpoints de rentabilidade devem permitir a filtragem por um intervalo de datas (inicial e final).
-[] -  O sistema deve considerar apenas dias úteis no cálculo.
+# Iniciar Backend
 
-Simulação de Rentabilidade Baseada em Composição, Datas e Valor
-[] -  O sistema deve permitir a simulação de rentabilidade com base na composição da carteira, intervalo de datas e valor inicial.
-[] -  O retorno deve conter os valores necessários para a construção de gráficos de rentabilidade ao longo do tempo.
+Inicialize o docker manualmente ou rode
 
+Windows
+```shell script
+start "" "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+```
+MacOS
+```shell script
+open /Applications/Docker.app
+```
 
-Requisitos Não Funcionais (RNFs)
-Segurança
-[] - Os dados sensíveis devem ser protegidos por criptografia e outras medidas de segurança.
+OBS: O sucesso dos comandos acima depende da localização do docker na sua maquina, caso não consiga executa-los abra-o manualmente.
 
-Tratamento de Erros e Logs
-[] -  O sistema deve retornar mensagens de erro amigáveis e informativas.
-[] -  Deve haver um sistema de log para monitoramento de falhas e análise de performance.
+## Criando .env
+```shell script
+cp .env.example .env
+```
+## OBS: Após criar .env preencher com as chaves necessarias
 
-⚙ Requisitos Operacionais (ROs)
-Banco de Dados
-[X] -  PostgreSQL rodando em um container Docker.
+Todas as etapas para criar o backend estão reunidas em um único comando:
 
-Ferramentas de Desenvolvimento
-[X] -  Prisma ORM para manipulação de banco de dados.
-[X] -  Node.js e TypeScript para desenvolvimento da API.
+```shell script
+yarn start:backend
+```
 
-Ambiente de Execução
-[X] -  A aplicação deve rodar via Docker Compose para facilitar o gerenciamento dos containers.
+O comando acima é um atalho para realizar as seguintes tarefas:
+
+```shell script
+# Command 1: Build Docker containers
+docker compose up --build -d
+
+# Command 2: Initializing prisma and run migrations
+npx prisma generate
+npx prisma migrate dev
+
+# Command 3: Run script to insert file's data into DB
+npx ts-node src/scripts/importData.ts
+```
+
+# Fluxo manual (alternativo)
+
+## Criando e subindo o container no docker
+```shell script
+docker compose up --build -d
+```
+
+## Gerando interfaces do prisma com base no schema
+```shell script
+npx prisma generate
+```
+
+## Rodando as migrations pelo prisma
+```shell script
+npx prisma migrate dev
+```
+
+## Rodando script de insersão de dados no banco
+```shell script
+yarn seeds
+```
+
+Abra o Docker Dashboard para verificar se todos os containers foram criados.
+![image](https://github.com/user-attachments/assets/9af2966a-32a5-410b-984d-a05b99dea90a)
+
+---
+
+**Pronto! A API está pronta para ser utilizada! 🥳**
+
+Aplicações | URL | User | Password
+--- | --- | --- | ---
+App - NodeJs | <http://localhost:3333> | - | -
+Documentação - Swagger | <http://localhost:3333/docs> | - | -
+Postgres - investodb | <http://localhost:5432> | admin | password
+
+---
+
+### Tecnologias Utilizada
+
+- [Docker][l-docker]
+- [NodeJs v20.12.2][l-nodejs]
+- [Prisma][l-prisma]
+- [Postgres][l-postgres]
+
+[l-docker]: https://www.docker.com
+[l-nodejs]: https://nodejs.org
+[l-prisma]: https://www.prisma.io
+[l-postgres]: https://hub.docker.com/_/postgres
