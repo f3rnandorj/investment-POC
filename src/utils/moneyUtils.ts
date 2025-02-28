@@ -39,9 +39,41 @@ function calculateSimulation({ totalOfDays, initialInvestment, profitabilityPeri
   return parseFloat(finalValue.toFixed(2));
 }
 
+type DailyReturn = {
+  date: Date; 
+  profitabilityDay: number;
+};
+
+export type AssetWithWeight = {
+  weight: number;
+  dailyReturns: DailyReturn[];
+};
+
+function calculatePortfolioReturns(assets: AssetWithWeight[]): DailyReturn[] {
+  const allDates = [...new Set(assets.flatMap((asset) => asset.dailyReturns.map((d) => d.date.getTime())))];
+
+  allDates.sort((a, b) => a - b);
+
+  const portfolioReturns: DailyReturn[] = allDates.map((timestamp) => {
+    const date = new Date(timestamp);
+
+    const profitabilityDay = assets.reduce((acc, asset) => {
+      const assetReturn = asset.dailyReturns.find((d) => d.date.getTime() === timestamp);
+      if (!assetReturn) return acc;
+
+      return acc + assetReturn.profitabilityDay * (asset.weight / 100);
+    }, 0);
+
+    return { date, profitabilityDay };
+  });
+
+  return portfolioReturns;
+}
+
 export const moneyUtils = {
   calculateDailyProfitability, 
   calculateSimulation,
   calculateCDIProfitability,
-  calculateProfitabilityPeriod
+  calculateProfitabilityPeriod,
+  calculatePortfolioReturns
 };

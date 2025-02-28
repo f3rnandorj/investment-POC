@@ -7,7 +7,7 @@ export async function appRoutes(app: FastifyInstance) {
 
   app.get("/price-history", getAssetPriceHistoryController);
 
-  app.get("/wallet-price-history", getManyAssetPriceHistoryController);
+  app.post("/wallet-price-history", getManyAssetPriceHistoryController);
 
   app.get("/simulate-investment", getSimulateInvestmentController);
 }
