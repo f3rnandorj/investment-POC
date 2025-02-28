@@ -8,13 +8,13 @@
     "start:dev": "tsx watch src/server.ts",
     "start:prod": "node build/server.js",
     "build": "tsup src --out-dir build",
-    "start:docker": "chmod +x src/scripts/start.sh && src/scripts/start.sh",
+    "start:backend": "chmod +x src/scripts/start.sh && src/scripts/start.sh",
     "docker:start": "docker compose up --build -d",
     "docker:stop": "docker compose stop",
     "migrate": "npx prisma migrate dev",
     "generate": "npx prisma generate",
     "studio": "npx prisma studio",
-    "script": "ts-node src/scripts/importData.ts"
+    "seeds": "ts-node src/scripts/importData.ts"
   },
   "license": "MIT",
   "devDependencies": {
