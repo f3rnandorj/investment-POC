@@ -1,4 +1,12 @@
+# Environment
 node_modules
+
+# Build
 build
+
+# Environment
 .env
+.env.test
+
+# Test
 coverage

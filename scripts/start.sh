@@ -25,6 +25,6 @@ npx prisma migrate dev
 sleep 4
 
 echo "🚀 Executando script de importação de dados..."
-npx ts-node src/scripts/importData.ts
+npx ts-node scripts/importData.ts
 
 

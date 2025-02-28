@@ -8,12 +8,16 @@
     "start:dev": "tsx watch src/server.ts",
     "start:prod": "node build/server.js",
     "build": "tsup src --out-dir build",
-    "start:backend": "chmod +x src/scripts/start.sh && src/scripts/start.sh",
+
+    "start:backend": "run-s script:permission script:start",
+    "script:permission": "chmod +x ./scripts/start.sh",
+    "script:start": "./scripts/start.sh",
+    
     "docker:start": "docker compose up --build -d",
     "docker:stop": "docker compose stop",
     "migrate": "npx prisma migrate dev",
     "generate": "npx prisma generate",
-    "seeds": "ts-node src/scripts/importData.ts",
+    "seeds": "ts-node scripts/importData.ts",
 
     "test:coverage": "vitest run --coverage --config vitest.coverage.config.mts",
     "pretest:coverage": "run-s test:create-prisma-environment test:install-prisma-environment",
@@ -26,6 +30,19 @@
     "test:install-prisma-environment": "npm link vitest-environment-prisma"
   },
   "license": "MIT",
+  "dependencies": {
+    "@fastify/swagger": "9.4.2",
+    "@fastify/swagger-ui": "5.2.2",
+    "@prisma/client": "6.4.1",
+    "csv-parser": "3.2.0",
+    "date-fns": "4.1.0",
+    "dotenv": "16.4.7",
+    "fastify": "5.2.1",
+    "is-business-day": "1.0.1",
+    "mongodb": "6.13.1",
+    "xlsx": "0.18.5",
+    "zod": "3.24.2"
+  },
   "devDependencies": {
     "@eslint/js": "9.21.0",
     "@types/node": "22.13.5",
@@ -43,18 +60,5 @@
     "typescript-eslint": "8.25.0",
     "vite-tsconfig-paths": "5.1.4",
     "vitest": "3.0.7"
-  },
-  "dependencies": {
-    "@fastify/swagger": "9.4.2",
-    "@fastify/swagger-ui": "5.2.2",
-    "@prisma/client": "6.4.1",
-    "csv-parser": "3.2.0",
-    "date-fns": "4.1.0",
-    "dotenv": "16.4.7",
-    "fastify": "5.2.1",
-    "is-business-day": "1.0.1",
-    "mongodb": "6.13.1",
-    "xlsx": "0.18.5",
-    "zod": "3.24.2"
   }
 }

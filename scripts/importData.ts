@@ -4,8 +4,8 @@ import path from "path";
 import csv from "csv-parser";
 import xlsx from "xlsx";
 import { Prisma, PrismaClient } from "@prisma/client";
-import { dateUtils } from "../utils/dateUtils";
-import { stringUtils } from "../utils/stringUtils";
+import { dateUtils } from "../src/utils/dateUtils";
+import { stringUtils } from "../src/utils/stringUtils";
 
 interface NativeAssetItem {
   codigoAtivo: string;
