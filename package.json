@@ -18,7 +18,7 @@
     "test:coverage": "vitest run --coverage --config vitest.coverage.config.mts",
     "pretest:coverage": "run-s test:create-prisma-environment test:install-prisma-environment",
 
-    "test:unit": "vitest run --config vitest.config.mts",
+    "test": "vitest run --config vitest.config.mts",
 
     "test:e2e": "vitest run --config vitest.e2e.config.mts",
     "pretest:e2e": "run-s test:create-prisma-environment test:install-prisma-environment",
