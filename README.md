@@ -82,7 +82,7 @@ Abra o Docker Dashboard para verificar se todos os containers foram criados.
 
 ---
 
-## Inicializando o backend
+## Rodando o backend localmente
 ```shell script
 yarn start:dev
 ```
@@ -93,7 +93,7 @@ Aplicações | URL | User | Password
 --- | --- | --- | ---
 App - NodeJs | <http://localhost:3333> | - | -
 Documentação - Swagger | <http://localhost:3333/docs> | - | -
-Postgres - investodb | <http://localhost:5432> | admin | password
+Postgres - investodb | `http://localhost:5432` | admin | password
 
 ---
 
