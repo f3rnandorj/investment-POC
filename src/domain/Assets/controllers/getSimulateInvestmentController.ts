@@ -2,12 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { PrismaAssetRepository } from "@/repositories";
 import { GetSimulateInvestmentUseCase } from "../useCases/getSimulateInvestmentUseCase";
-
-// EndpointEX http://localhost:3333/simulate-investment?ticker=ALUG11&startDate=01/01/2024&endDate=01/02/2024&investment=1000
-
-// or
-
-// EndpointEX http://localhost:3333/simulate-investment?ticker=ALUG11&startDate=01/01/2024&endDate=01/02/2024&investment=1000
+import { AssetNotFindError } from "@/errors";
 
 export async function getSimulateInvestmentController(request: FastifyRequest, reply: FastifyReply) {
   const paramsSchema = z.object({
@@ -27,6 +22,10 @@ export async function getSimulateInvestmentController(request: FastifyRequest, r
 
     return reply.status(200).send(result);
   } catch (err) {
+    if (err instanceof AssetNotFindError) {
+      reply.status(404).send({ message: err.message });
+    }
+
     throw err;
   }
 }

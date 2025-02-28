@@ -4,8 +4,6 @@ import { GetAssetPriceHistoryUseCase } from "../useCases/getAssetPriceHistoryUse
 import { PrismaAssetRepository, PrismaCDIRepository } from "@/repositories";
 import { AssetNotFindError } from "@/errors";
 
-//EndpointEX http://localhost:3333/price-history?ticker=ALUG11&startDate=2023-01-01&endDate=2023-03-20
-
 export async function getAssetPriceHistoryController(request: FastifyRequest, reply: FastifyReply) {
   const paramsSchema = z.object({
     ticker: z.string().min(1, "Ticker não pode ser vazio"),

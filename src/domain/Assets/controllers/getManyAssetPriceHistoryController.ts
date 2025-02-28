@@ -5,7 +5,6 @@ import { AssetNotFindError } from "@/errors";
 import { GetManyAssetPriceHistoryUseCase } from "../useCases/getManyAssetPriceHistoryUseCase";
 
 const PERCENT = 100;
-// EndpointEX http://localhost:3333/wallet-price-history?tickers=ALUG11&tickers=WRLD11&startDate=2023-01-01&endDate=2023-05-20
 
 export async function getManyAssetPriceHistoryController(request: FastifyRequest, reply: FastifyReply) {
   const paramsSchema = z.object({
@@ -14,7 +13,7 @@ export async function getManyAssetPriceHistoryController(request: FastifyRequest
         ticker: z.string().min(1, "Ticker não pode ser vazio"),
         weight: z.string().min(1, "Peso deve ser maior ou igual a 0"),
       })
-    ).min(1, "Deve haver pelo menos um ticker"),
+    ).min(2, "Deve haver pelo dois um ticker"),
     startDate: z.string().optional(),
     endDate: z.string().optional(),
   });

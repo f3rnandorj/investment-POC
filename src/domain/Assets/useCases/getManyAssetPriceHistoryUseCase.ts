@@ -1,6 +1,6 @@
 import { AssetNotFindError } from "@/errors";
 import { AssetBaseRepository, CDIBaseRepository } from "@/repositories";
-import { AssetWithWeight, dateUtils, moneyUtils, stringUtils } from "@/utils";
+import { dateUtils, moneyUtils } from "@/utils";
 import { PriceHistory } from "../AssetTypes";
 
 interface GetManyAssetPriceHistoryUseCaseRequest {
