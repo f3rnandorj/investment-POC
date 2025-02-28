@@ -1,12 +1,10 @@
 
-import { GetAllAssetInfosUseCase } from "@/domain";
-import { PrismaAssetInfoRepository } from "@/repositories";
 import { FastifyReply, FastifyRequest } from "fastify";
+import { makeGetAllAssetInfosUseCase } from "../factories/makeGetAllAssetInfosUseCase";
 
 export async function getAllAssetInfosController(request: FastifyRequest, reply: FastifyReply) {
   try {
-    const prismaAssetInfoRepository = new PrismaAssetInfoRepository();
-    const getAllAssetInfosUseCase = new GetAllAssetInfosUseCase(prismaAssetInfoRepository);
+    const getAllAssetInfosUseCase = makeGetAllAssetInfosUseCase();
 
     const data = await getAllAssetInfosUseCase.execute();
 

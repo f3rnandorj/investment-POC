@@ -1,8 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
-import { PrismaAssetRepository, PrismaCDIRepository } from "@/repositories";
 import { AssetNotFindError } from "@/errors";
-import { GetManyAssetPriceHistoryUseCase } from "../useCases/getManyAssetPriceHistoryUseCase";
+import { makeGetManyAssetPriceHistoryUseCase } from "../factories/makeGetManyAssetPriceHistoryUseCase";
 
 const PERCENT = 100;
 
@@ -27,9 +26,7 @@ export async function getManyAssetPriceHistoryController(request: FastifyRequest
       reply.status(400).send({ message: `A soma dos pesos (${weights}%) não é igual a ${PERCENT}%.` });
     }
 
-    const prismaCDIRepository = new PrismaCDIRepository();
-    const prismaAssetRepository = new PrismaAssetRepository();
-    const getAssetPriceHistoryUseCase = new GetManyAssetPriceHistoryUseCase(prismaAssetRepository, prismaCDIRepository);
+    const getAssetPriceHistoryUseCase = makeGetManyAssetPriceHistoryUseCase();
 
     const data = await getAssetPriceHistoryUseCase.execute({ assets, startDate, endDate });
 

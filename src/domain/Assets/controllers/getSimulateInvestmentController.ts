@@ -1,8 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
-import { PrismaAssetRepository } from "@/repositories";
-import { GetSimulateInvestmentUseCase } from "../useCases/getSimulateInvestmentUseCase";
 import { AssetNotFindError } from "@/errors";
+import { makeGetSimulateInvestmentUseCase } from "../factories/makeGetSimulateInvestmentUseCase";
 
 export async function getSimulateInvestmentController(request: FastifyRequest, reply: FastifyReply) {
   const paramsSchema = z.object({
@@ -15,8 +14,7 @@ export async function getSimulateInvestmentController(request: FastifyRequest, r
   try {
     const { ticker, startDate, endDate, investment } = paramsSchema.parse(request.query);
 
-    const prismaAssetRepository = new PrismaAssetRepository();
-    const simulateInvestmentUseCase = new GetSimulateInvestmentUseCase(prismaAssetRepository);
+    const simulateInvestmentUseCase = makeGetSimulateInvestmentUseCase();
 
     const result = await simulateInvestmentUseCase.execute({ ticker, startDate, endDate, investment });
 
