@@ -105,7 +105,7 @@ async function insertData(modelName: ModelNames, dataArray: any[]) {
     for (let i = 0; i < dataArray.length; i += batchSize) {
       await prisma.cdi.createMany({
         data: dataArray.slice(i, i + batchSize).map((data) => ({
-          date: dateUtils.convertToISODate(data.date),
+          date: dateUtils.convertToISODate(data.date) as Date,
           rate: data.rate,
         })),
       });

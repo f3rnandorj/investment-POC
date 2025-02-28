@@ -1,8 +1,17 @@
 import { prisma } from "@/lib/prisma";
 import { AssetBaseRepository } from "../base/AssetBaseRepository";
-import { Asset } from "@prisma/client";
+import { Asset, Prisma } from "@prisma/client";
 
 export class PrismaAssetRepository implements AssetBaseRepository {
+  async create(data: Prisma.AssetCreateInput): Promise<Asset> {
+    return await prisma.asset.create({
+      data: {
+        ...data,
+        price_history: JSON.stringify(data.price_history)
+      } 
+    });
+  }
+
   async getManyBySymbol(symbols: string[]): Promise<Asset[]> {
     const assets = await prisma.asset.findMany({
       where: { symbol: { in: symbols } }, 
