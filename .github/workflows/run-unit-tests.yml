@@ -10,11 +10,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'yarn'
 
-      - run: yarn install --frozen-lockfile
+      - name: Install Packages
+        run: yarn install --frozen-lockfile
 
-      - run: yarn test
+      - name: Run typescript check
+        run: yarn tsc --noEmit  
+
+      - name: Run test
+        run: yarn test
