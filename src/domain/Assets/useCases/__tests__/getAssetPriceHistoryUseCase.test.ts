@@ -3,6 +3,7 @@ import { GetAssetPriceHistoryUseCase } from "../getAssetPriceHistoryUseCase";
 import { InMemoryAssetRepository, InMemoryCDIRepository } from "@/repositories/inMemory";
 import { assetMocks, CDIMocks } from "@/mocks";
 import { AssetNotFindError } from "@/errors";
+import { dateUtils } from "@/utils";
 
 let inMemoryCDIRepository: InMemoryCDIRepository;
 let inMemoryAssetRepository: InMemoryAssetRepository;
@@ -40,20 +41,20 @@ describe("GetAssetPriceHistory Use Case", () => {
 
     expect(tickerProfitability.length).toBeGreaterThan(0);
     expect(cdiProfitability.length).toBeGreaterThan(0);
-
+    
     expect(tickerProfitability).toEqual([
       {
-        date: new Date("2024-01-29T03:00:00.000Z"),
+        date: new Date("2024 01 29"),
         profitabilityDay: 1.3864229641614267
       }
     ]);
     expect(cdiProfitability).toEqual([
       {
-        date: new Date("2024-01-26T03:00:00.000Z"),
+        date: new Date("2024 01 26"),
         profitabilityDay: 1.00043739
       },
       {
-        date: new Date("2024-01-29T03:00:00.000Z"),
+        date: new Date("2024 01 29"),
         profitabilityDay: 1.00043739
       }
     ]);
