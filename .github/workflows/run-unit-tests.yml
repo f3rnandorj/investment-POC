@@ -17,4 +17,7 @@ jobs:
 
       - run: yarn install --frozen-lockfile
 
+      - name: Set UTC Timezone
+        run: echo "TZ=UTC" >> $GITHUB_ENV
+
       - run: yarn test

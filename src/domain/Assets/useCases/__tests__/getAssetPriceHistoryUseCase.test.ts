@@ -10,6 +10,8 @@ let sut: GetAssetPriceHistoryUseCase;
 
 describe("GetAssetPriceHistory Use Case", () => {
   beforeEach(() => {
+    // process.env.TZ = "UTC";
+
     inMemoryCDIRepository = new InMemoryCDIRepository();
     inMemoryAssetRepository = new InMemoryAssetRepository();
     sut = new GetAssetPriceHistoryUseCase(inMemoryAssetRepository, inMemoryCDIRepository);
@@ -36,12 +38,16 @@ describe("GetAssetPriceHistory Use Case", () => {
       endDate: "29/01/2024",
     });
 
+    console.log(tickerProfitability);
+
     expect(tickerProfitability.length).toBeGreaterThan(0);
     expect(cdiProfitability.length).toBeGreaterThan(0);
 
-    expect(tickerProfitability).toEqual([
+    expect(tickerProfitability.map((item) => ({ 
+      ...item, date: item.date.toISOString() 
+    }))).toEqual([
       {
-        date: new Date("2024-01-29T03:00:00.000Z"),
+        date: "2024-01-29T03:00:00.000Z", 
         profitabilityDay: 1.3864229641614267
       }
     ]);
