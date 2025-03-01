@@ -11,8 +11,6 @@ let sut: GetAssetPriceHistoryUseCase;
 
 describe("GetAssetPriceHistory Use Case", () => {
   beforeEach(() => {
-    // process.env.TZ = "UTC";
-
     inMemoryCDIRepository = new InMemoryCDIRepository();
     inMemoryAssetRepository = new InMemoryAssetRepository();
     sut = new GetAssetPriceHistoryUseCase(inMemoryAssetRepository, inMemoryCDIRepository);
