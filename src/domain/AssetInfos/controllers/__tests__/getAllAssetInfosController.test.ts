@@ -10,7 +10,7 @@ describe("GetAllAssetInfos Controller (e2e)", () => {
     
     console.log("⏳ Importando dados antes de rodar os testes...");
     try {
-      execSync("npx ts-node src/scripts/importData.ts", { stdio: "inherit" });
+      execSync("npx ts-node scripts/importData.ts", { stdio: "inherit" });
     } catch (error) {
       console.error("❌ Erro ao importar dados:", error);
       process.exit(1); 

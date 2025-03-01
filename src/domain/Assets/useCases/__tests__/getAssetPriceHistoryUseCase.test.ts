@@ -3,7 +3,6 @@ import { GetAssetPriceHistoryUseCase } from "../getAssetPriceHistoryUseCase";
 import { InMemoryAssetRepository, InMemoryCDIRepository } from "@/repositories/inMemory";
 import { assetMocks, CDIMocks } from "@/mocks";
 import { AssetNotFindError } from "@/errors";
-import { dateUtils } from "@/utils";
 
 let inMemoryCDIRepository: InMemoryCDIRepository;
 let inMemoryAssetRepository: InMemoryAssetRepository;

@@ -2,7 +2,6 @@ import request from "supertest";
 import { execSync } from "node:child_process";
 import { app } from "@/app";
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import { AssetNotFindError } from "@/errors";
 
 describe("GetAssetPriceHistory Controller (e2e)", () => {
   beforeAll(async () => {
@@ -10,7 +9,7 @@ describe("GetAssetPriceHistory Controller (e2e)", () => {
     
     console.log("⏳ Importando dados antes de rodar os testes...");
     try {
-      execSync("npx ts-node src/scripts/importData.ts", { stdio: "inherit" });
+      execSync("npx ts-node scripts/importData.ts", { stdio: "inherit" });
     } catch (error) {
       console.error("❌ Erro ao importar dados:", error);
       process.exit(1); 
