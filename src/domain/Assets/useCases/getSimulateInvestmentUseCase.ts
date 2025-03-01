@@ -27,7 +27,7 @@ export class GetSimulateInvestmentUseCase {
     investment,
     ticker, 
   }: GetSimulateInvestmentUseCaseRequest): Promise<GetSimulateInvestmentUseCaseResponse> {
-    const { removeNotBusinessDays, convertToISODate, filterArrayByDate } = dateUtils;
+    const { convertToISODate, filterArrayByDate } = dateUtils;
     const { calculateSimulation, calculateDailyProfitability, calculateProfitabilityPeriod } = moneyUtils;
 
     const startDateFormatted = startDate ? convertToISODate(startDate) as Date : null;
@@ -41,14 +41,10 @@ export class GetSimulateInvestmentUseCase {
 
     const priceHistory: PriceHistory[] = JSON.parse(asset.price_history);
 
-    const priceHistoryFiltered = removeNotBusinessDays(
-      priceHistory
-        .map((assetPrice) => ({
-          date: new Date(assetPrice.date), 
-          close_price: assetPrice.close_price,
-        })),        
-      "date"
-    );
+    const priceHistoryFiltered = priceHistory.map((assetPrice) => ({
+      date: new Date(assetPrice.date), 
+      close_price: assetPrice.close_price,
+    }));        
 
     const start = startDateFormatted ? startDateFormatted : priceHistoryFiltered[0].date;
     const end = endDateFormatted ? endDateFormatted : priceHistoryFiltered[priceHistoryFiltered.length -1].date;

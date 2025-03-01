@@ -1,5 +1,4 @@
 import { format } from "date-fns";
-import { get as isBusinessDay } from "is-business-day";
 
 /**
  * Converte uma data para um formato específico dependendo do tipo de entrada.
@@ -30,21 +29,6 @@ function formatTimestamp(timestamp: number): string {
   return format(date, "dd/MM/yyyy");
 }
 
-function removeNotBusinessDays<T>(dataArray: T[], dateKey: keyof T): T[] {
-  return dataArray.filter((item) => {
-    const dateValue = item[dateKey];
-
-    // Verifica se o valor é uma string e converte para Date
-    const date = typeof dateValue === "string" ? new Date(dateValue) : dateValue;
-
-    if (!(date instanceof Date) || isNaN(date.getTime())) {
-      throw new Error(`O valor em ${String(dateKey)} não é uma data válida.`);
-    }
-
-    return isBusinessDay(date);
-  });
-}
-
 type DateFilterParams<T> = {
   array: T[];
   startDate: Date;
@@ -70,6 +54,5 @@ function filterArrayByDate<T extends { date: Date }>({
 export const dateUtils = {
   convertToISODate,
   formatTimestamp,
-  removeNotBusinessDays,
   filterArrayByDate
 };

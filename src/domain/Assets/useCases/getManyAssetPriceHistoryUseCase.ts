@@ -28,7 +28,7 @@ export class GetManyAssetPriceHistoryUseCase {
   ) {}
 
   async execute({ assets, endDate, startDate }: GetManyAssetPriceHistoryUseCaseRequest): Promise<GetManyAssetPriceHistoryUseCaseResponse> {
-    const { removeNotBusinessDays, convertToISODate, filterArrayByDate } = dateUtils;
+    const { convertToISODate, filterArrayByDate } = dateUtils;
     const { calculateDailyProfitability, calculateCDIProfitability, calculatePortfolioReturns } = moneyUtils;
 
     const startDateFormatted = startDate ? convertToISODate(startDate) as Date : null;
@@ -43,14 +43,10 @@ export class GetManyAssetPriceHistoryUseCase {
 
       const tickerHistory: PriceHistory[] = JSON.parse(asset.price_history);
 
-      const tickerHistoryFiltered = removeNotBusinessDays(
-        tickerHistory
-          .map((assetPrice) => ({
-            date: new Date(assetPrice.date),
-            close_price: assetPrice.close_price,
-          })),
-        "date"
-      );
+      const tickerHistoryFiltered = tickerHistory.map((assetPrice) => ({
+        date: new Date(assetPrice.date),
+        close_price: assetPrice.close_price,
+      }));
 
       const start = startDateFormatted ? startDateFormatted : tickerHistoryFiltered[0].date;
       const end = endDateFormatted ? endDateFormatted : tickerHistoryFiltered[tickerHistoryFiltered.length -1].date;
@@ -84,14 +80,10 @@ export class GetManyAssetPriceHistoryUseCase {
 
     const CDIPriceHistory = await this.CDIRepository.getAll();
 
-    const CDIHistoryFiltered = removeNotBusinessDays(
-      CDIPriceHistory
-        .map((assetPrice) => ({
-          date: new Date(assetPrice.date),
-          rate: assetPrice.rate,
-        })),
-      "date"
-    );
+    const CDIHistoryFiltered = CDIPriceHistory.map((assetPrice) => ({
+      date: new Date(assetPrice.date),
+      rate: assetPrice.rate,
+    }));
 
     const start = startDateFormatted ? startDateFormatted : CDIHistoryFiltered[0].date;
     const end = endDateFormatted ? endDateFormatted : CDIHistoryFiltered[CDIHistoryFiltered.length -1].date;

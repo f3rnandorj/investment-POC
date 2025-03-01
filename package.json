@@ -23,6 +23,7 @@
     "pretest:coverage": "run-s test:create-prisma-environment test:install-prisma-environment",
 
     "test": "vitest run --config vitest.config.mts",
+    "test:watch": "vitest --config vitest.config.mts",
 
     "test:e2e": "vitest run --config vitest.e2e.config.mts",
     "pretest:e2e": "run-s test:create-prisma-environment test:install-prisma-environment",
@@ -38,7 +39,6 @@
     "date-fns": "4.1.0",
     "dotenv": "16.4.7",
     "fastify": "5.2.1",
-    "is-business-day": "1.0.1",
     "mongodb": "6.13.1",
     "xlsx": "0.18.5",
     "zod": "3.24.2"
