@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { GetAssetPriceHistoryUseCase } from "../getAssetPriceHistoryUseCase";
 import { InMemoryAssetRepository, InMemoryCDIRepository } from "@/repositories/inMemory";
 import { assetMocks, CDIMocks } from "@/mocks";
-import { AssetNotFindError } from "@/errors";
+import { AssetNotFindError, DateIntervalTooShortError } from "@/errors";
 
 let inMemoryCDIRepository: InMemoryCDIRepository;
 let inMemoryAssetRepository: InMemoryAssetRepository;
@@ -47,10 +47,6 @@ describe("GetAssetPriceHistory Use Case", () => {
     ]);
     expect(cdiProfitability).toEqual([
       {
-        date: new Date("2024 01 26"),
-        profitabilityDay: 1.00043739
-      },
-      {
         date: new Date("2024 01 29"),
         profitabilityDay: 1.00043739
       }
@@ -67,19 +63,16 @@ describe("GetAssetPriceHistory Use Case", () => {
     })).rejects.toBeInstanceOf(AssetNotFindError);
   });
 
-  it("should return an empty array when does not have any registers in the interval of dates", async () => {
+  it("should return an error when does not have more than two interval days", async () => {
     const { FIRST_TICKER_OF_MOCKED_DATA } = assetMocks;
 
     const SATURDAY = "27/01/2024";
     const SUNDAY = "28/01/2024";
 
-    const { cdiProfitability, tickerProfitability } = await sut.execute({
+    await expect(() => sut.execute({
       ticker: FIRST_TICKER_OF_MOCKED_DATA,
       startDate: SATURDAY,
       endDate: SUNDAY,
-    });
-
-    expect(tickerProfitability.length).toEqual(0);
-    expect(cdiProfitability.length).toEqual(0);
+    })).rejects.toBeInstanceOf(DateIntervalTooShortError);
   });
 });
