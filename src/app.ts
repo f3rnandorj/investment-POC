@@ -20,8 +20,8 @@ app.register(fastifySwagger, {
     },
     servers: [
       {
-        url: "http://localhost:3333",
-        description: "Development server",
+        url: process.env.BASE_URL || "http://localhost:3333",
+        description: process.env.NODE_ENV === "prod" ? "Production server" : "Development server",
       }
     ],
     externalDocs: {
@@ -49,7 +49,7 @@ app.setErrorHandler((error, _, reply) => {
       .send({ message: "Validation error.", issues: error.format() });
   }
 
-  if (env.NODE_ENV !== "production") {
+  if (env.NODE_ENV !== "prod") {
     console.error(error);
   } else {
     // Here we can log to a external tool like DataDog/NewRelic/Sentry

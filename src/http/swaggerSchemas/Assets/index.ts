@@ -15,7 +15,7 @@ const walletPriceHistory = {
           },
           required: ["ticker", "weight"]
         },
-        minItems: 2,
+        minItems: 1,
         description: "Lista de ativos da carteira, com pelo menos um ativo"
       },
       startDate: { type: "string", description: "Data de início no formato DD/MM/AAAA", nullable: true },
@@ -52,7 +52,7 @@ const walletPriceHistory = {
     400: {
       type: "object",
       properties: {
-        message: { type: "string", example: "A soma dos pesos não é igual a 100%." }
+        message: { type: "string", example: "A soma dos pesos não é igual a 100%. ||  O intervalo de datas deve ser de pelo menos dois dias." }
       }
     },
     404: {
@@ -133,6 +133,12 @@ const priceHistory = {
             }
           }
         }
+      }
+    },
+    400: {
+      type: "object",
+      properties: {
+        message: { type: "string", example: "O intervalo de datas deve ser de pelo menos dois dias." }
       }
     },
     404: {

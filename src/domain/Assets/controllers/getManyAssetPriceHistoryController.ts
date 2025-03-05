@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
-import { AssetNotFindError } from "@/errors";
+import { AssetNotFindError, DateIntervalTooShortError } from "@/errors";
 import { makeGetManyAssetPriceHistoryUseCase } from "../factories/makeGetManyAssetPriceHistoryUseCase";
 
 const PERCENT = 100;
@@ -12,7 +12,7 @@ export async function getManyAssetPriceHistoryController(request: FastifyRequest
         ticker: z.string().min(1, "Ticker não pode ser vazio"),
         weight: z.string().min(1, "Peso deve ser maior ou igual a 0"),
       })
-    ).min(2, "Deve haver pelo dois um ticker"),
+    ).min(1, "Deve haver pelo um um ticker"),
     startDate: z.string().optional(),
     endDate: z.string().optional(),
   });
@@ -34,6 +34,10 @@ export async function getManyAssetPriceHistoryController(request: FastifyRequest
   } catch (err) {
     if (err instanceof AssetNotFindError) {
       reply.status(404).send({ message: err.message });
+    }
+
+    if(err instanceof DateIntervalTooShortError) {
+      reply.status(400).send({ message: err.message });
     }
 
     throw err;

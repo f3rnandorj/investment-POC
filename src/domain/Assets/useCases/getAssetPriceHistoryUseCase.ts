@@ -1,7 +1,8 @@
-import { AssetNotFindError } from "@/errors";
+import { AssetNotFindError, DateIntervalTooShortError } from "@/errors";
 import { AssetBaseRepository, CDIBaseRepository } from "@/repositories";
 import { dateUtils, moneyUtils } from "@/utils";
 import { PriceHistory } from "../AssetTypes";
+import { differenceInDays } from "date-fns";
 
 interface GetAssetPriceHistoryUseCaseRequest {
   ticker: string;
@@ -31,7 +32,11 @@ export class GetAssetPriceHistoryUseCase {
     
     const startDateFormatted = startDate ? convertToISODate(startDate) as Date : null;
     const endDateFormatted = endDate ? convertToISODate(endDate) as Date : null;
-
+    
+    if(startDateFormatted && endDateFormatted && differenceInDays(endDateFormatted, startDateFormatted) < 2) {
+      throw new DateIntervalTooShortError();
+    }
+    
     const asset = await this.assetRepository.getBySymbol(ticker);
 
     const CDIPriceHistory = await this.CDIRepository.getAll();
@@ -82,7 +87,7 @@ export class GetAssetPriceHistoryUseCase {
       cdiProfitability: CDIHistoryFilteredByDate.map((cdi) => ({
         date: cdi.date,
         profitabilityDay: calculateCDIProfitability(cdi.rate)
-      }))
+      })).slice(1)
     };
   
     return formattedData;

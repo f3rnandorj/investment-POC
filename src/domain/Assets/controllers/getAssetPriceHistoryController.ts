@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
-import { AssetNotFindError } from "@/errors";
+import { AssetNotFindError, DateIntervalTooShortError } from "@/errors";
 import { makeGetAssetPriceHistoryUseCase } from "../factories/makeGetAssetPriceHistoryUseCase";
 
 export async function getAssetPriceHistoryController(request: FastifyRequest, reply: FastifyReply) {
@@ -21,6 +21,10 @@ export async function getAssetPriceHistoryController(request: FastifyRequest, re
   } catch (err) {
     if(err instanceof AssetNotFindError) {
       reply.status(404).send({ message: err.message });
+    }
+    
+    if(err instanceof DateIntervalTooShortError) {
+      reply.status(400).send({ message: err.message });
     }
 
     throw err;
