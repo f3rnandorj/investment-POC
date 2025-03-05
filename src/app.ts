@@ -20,7 +20,7 @@ app.register(fastifySwagger, {
     },
     servers: [
       {
-        url: process.env.BASE_URL || "http://localhost:3333",
+        url: process.env.NODE_ENV === "prod" ? "https://investo-challenge.onrender.com" : "http://localhost:3333",
         description: process.env.NODE_ENV === "prod" ? "Production server" : "Development server",
       }
     ],
