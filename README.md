@@ -6,7 +6,7 @@ https://www.docker.com/
 
 ## Clonando repositorio e navegando para o projeto
 ```shell script
-git clone https://github.com/f3rnandorj/investo-challenge && cd ..
+git clone https://github.com/f3rnandorj/investment-POC && cd ..
 ```
 
 ## Instalar dependências de desenvolvimento
